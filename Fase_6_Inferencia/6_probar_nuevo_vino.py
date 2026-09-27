@@ -31,8 +31,6 @@ pesos_optimizados = modelo_optimizado['pesos_optimizados']
 
 
 def predecir_calidad_de_un_vino(alcohol, acidez_volatil, sulfatos, ph, nombre_del_vino="Vino de Prueba"):
-    print(f"\n--- Evaluando: {nombre_del_vino} ---")
-    
     fila_vino = {
         'alcohol': float(alcohol),
         'acidez_volatil': float(acidez_volatil),
@@ -40,50 +38,21 @@ def predecir_calidad_de_un_vino(alcohol, acidez_volatil, sulfatos, ph, nombre_de
         'ph': float(ph)
     }
     
-    print("Valores quimicos de entrada:")
-    print(f"  Alcohol:        {fila_vino['alcohol']:.2f}% vol.")
-    print(f"  Acidez Volatil: {fila_vino['acidez_volatil']:.3f} g/dm3")
-    print(f"  Sulfatos:       {fila_vino['sulfatos']:.3f} g/dm3")
-    print(f"  pH:             {fila_vino['ph']:.2f}")
-    
-    # Paso 1: Fuzzificacion
+    # 1. Fuzzificacion
     grados_vino = fuzzificar_vino(fila_vino, cortes_optimizados)
-    print("\n[Paso 1] Fuzzificacion:")
-    for caracteristica, grados in grados_vino.items():
-        print(f"  {caracteristica:15s} -> Bajo={grados['bajo']:.2f}, Medio={grados['medio']:.2f}, Alto={grados['alto']:.2f}")
-        
-    # Paso 2: Inferencia Mamdani
+    
+    # 2. Inferencia Mamdani
     disparos = inferencia_mamdani_vino(grados_vino, lista_reglas, pesos_optimizados)
-    disparos.sort(key=lambda d: d['impacto'], reverse=True)
     
-    print("\n[Paso 2] Inferencia (Reglas que mas aportaron):")
-    for disparo in disparos[:3]:
-        partes_texto = []
-        for variable, valor in disparo['condiciones'].items():
-            partes_texto.append(variable + " = " + valor)
-        texto_si = " Y ".join(partes_texto)
-        
-        calidad = disparo['calidad_consecuente']
-        fuerza = round(disparo['fuerza_disparo'], 2)
-        impacto = round(disparo['impacto'], 3)
-        print(f"  SI {texto_si} -> Calidad = {calidad} (Fuerza = {fuerza}, Impacto = {impacto})")
-        
-    # Paso 3: Agregacion difusa
+    # 3. Agregacion
     puntajes = agregar_impactos_por_calidad(disparos)
-    suma_total_puntajes = sum(puntajes.values())
     
-    print("\n[Paso 3] Agregacion de puntajes:")
-    for calidad in ['BAJA', 'MEDIA', 'ALTA']:
-        porcentaje_relativo = (puntajes[calidad] / suma_total_puntajes * 100.0) if suma_total_puntajes > 0 else 33.3
-        print(f"  Puntaje {calidad:5s}: {puntajes[calidad]:.3f} ({porcentaje_relativo:.1f}%)")
-        
-    # Paso 4: Defuzzificacion
+    # 4. Defuzzificacion
     calidad_predicha, porcentaje_certidumbre, calificacion_continua = defuzzificar_calidad(puntajes)
-    print("\n[Paso 4] Defuzzificacion:")
-    print(f"  Calidad Predicha por Maxima Pertenencia: [{calidad_predicha}]")
-    print(f"  Porcentaje de Certidumbre:              {porcentaje_certidumbre:.1f}%")
-    print(f"  Calificacion continua (Centroide CoG):  {calificacion_continua:.2f} / 10")
-    print(f"=> Resultado Final: {calidad_predicha}\n")
+    
+    print(f"\n{nombre_del_vino}:")
+    print(f"  Quimica: Alcohol={alcohol}%, Acidez Volatil={acidez_volatil}, Sulfatos={sulfatos}, pH={ph}")
+    print(f"  Prediccion: Calidad {calidad_predicha} (Certidumbre: {porcentaje_certidumbre:.1f}%, Nota: {calificacion_continua:.2f}/10)")
     
     return calidad_predicha
 
@@ -92,12 +61,10 @@ def predecir_calidad_de_un_vino(alcohol, acidez_volatil, sulfatos, ph, nombre_de
 predecir_vino = predecir_calidad_de_un_vino
 
 if __name__ == "__main__":
-    print("=== Fase 6: Inferencia de Calidad en Nuevos Vinos ===")
-    
-    # 3 Casos de prueba tipicos
-    predecir_calidad_de_un_vino(alcohol=12.5, acidez_volatil=0.35, sulfatos=0.85, ph=3.28, nombre_del_vino="Vino Reserva A (Esperado: ALTA)")
-    predecir_calidad_de_un_vino(alcohol=10.2, acidez_volatil=0.52, sulfatos=0.62, ph=3.35, nombre_del_vino="Vino de Mesa B (Esperado: MEDIA)")
-    predecir_calidad_de_un_vino(alcohol=9.1, acidez_volatil=0.88, sulfatos=0.42, ph=3.52, nombre_del_vino="Vino Defectuoso C (Esperado: BAJA)")
+    # Probamos 3 vinos representativos
+    predecir_calidad_de_un_vino(12.5, 0.35, 0.85, 3.28, "Vino de Alta Gama (Esperado: ALTA)")
+    predecir_calidad_de_un_vino(10.2, 0.52, 0.62, 3.35, "Vino Estandar de Mesa (Esperado: MEDIA)")
+    predecir_calidad_de_un_vino(9.1, 0.88, 0.42, 3.52, "Vino Defectuoso (Esperado: BAJA)")
     
     # Prueba manual interactiva
     print("Deseas ingresar los datos de un vino manualmente? (s/n): ", end="")

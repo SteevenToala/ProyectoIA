@@ -9,12 +9,9 @@ import numpy as np
 carpeta_actual = os.path.dirname(os.path.abspath(__file__))
 carpeta_proyecto = os.path.abspath(os.path.join(carpeta_actual, ".."))
 
-print("=== Fase 1: Preparacion de Datos del Vino ===")
-
 # 1. Cargamos el archivo original de vino tinto
 ruta_archivo_csv = os.path.join(carpeta_proyecto, "Dataset_Wine_Qhality", "winequality-red.csv")
 datos_originales = pd.read_csv(ruta_archivo_csv, sep=";")
-print("Total de vinos en el dataset original:", len(datos_originales))
 
 # 2. Seleccionamos unicamente las 4 caracteristicas quimicas que vamos a usar
 # y renombramos 'volatile acidity' a 'acidez_volatil' para que sea mas claro
@@ -131,9 +128,7 @@ datos_vino['ph_discreto'] = pd.cut(
 datos_entrenamiento = datos_vino.sample(frac=0.80, random_state=42).copy()
 datos_prueba = datos_vino.drop(datos_entrenamiento.index).copy()
 
-print(f"\nDivision de datos completada:")
-print(f"  Vinos para entrenamiento: {len(datos_entrenamiento)} (80%)")
-print(f"  Vinos para prueba:        {len(datos_prueba)} (20%)")
+print(f"Muestras divididas: {len(datos_entrenamiento)} entrenamiento (80%) y {len(datos_prueba)} prueba (20%)")
 
 # 7. Guardamos los archivos para que los lean las siguientes fases
 ruta_guardar_preparados = os.path.join(carpeta_actual, "datos_preparados.csv")
@@ -147,8 +142,3 @@ datos_prueba.to_csv(ruta_guardar_test, index=False)
 
 with open(ruta_guardar_cortes, "w") as archivo_json:
     json.dump(cortes_quimicos, archivo_json, indent=4)
-
-print("\nArchivos generados correctamente en Fase_1_Preparacion:")
-print("  - datos_train.csv")
-print("  - datos_test.csv")
-print("  - cortes_iniciales.json")

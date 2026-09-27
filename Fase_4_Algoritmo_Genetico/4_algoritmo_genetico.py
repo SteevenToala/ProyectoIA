@@ -11,7 +11,6 @@ import matplotlib.pyplot as plt
 carpeta_actual = os.path.dirname(os.path.abspath(__file__))
 carpeta_proyecto = os.path.abspath(os.path.join(carpeta_actual, ".."))
 
-print("=== Fase 4: Algoritmo Genetico para Optimizar el Modelo del Vino ===")
 
 # 1. Cargamos los datos de entrenamiento, cortes base y reglas PRISM
 ruta_datos_train = os.path.join(carpeta_proyecto, "Fase_1_Preparacion", "datos_train.csv")
@@ -237,11 +236,8 @@ def mutar_cromosoma_gaussiano(cromosoma):
 
 
 # 6. Bucle Evolutivo
-print(f"Poblacion: {tamano_poblacion} | Generaciones: {numero_generaciones}")
-print(f"Probabilidad Cruce: {probabilidad_cruce} | Probabilidad Mutacion: {probabilidad_mutacion}")
-
 aptitud_inicial = calcular_aptitud_individuo(cromosoma_semilla)
-print(f"Aptitud inicial con cortes por cuantiles: {aptitud_inicial}%\n")
+print(f"Exactitud inicial antes de optimizar: {aptitud_inicial}%\n")
 
 poblacion_actual = [list(cromosoma_semilla)]
 for _ in range(tamano_poblacion - 1):
@@ -262,7 +258,7 @@ for generacion in range(1, numero_generaciones + 1):
     historial_convergencia.append(mejor_aptitud_global)
     
     if generacion % 5 == 0 or generacion == numero_generaciones:
-        print(f"  Generacion {generacion:02d}/{numero_generaciones} -> Mejor Exactitud en Train: {mejor_aptitud_global:.2f}%")
+        print(f"  Generacion {generacion}/{numero_generaciones} -> Exactitud Train: {mejor_aptitud_global:.2f}%")
         
     # Elitismo: preservamos al mejor individuo
     nueva_poblacion = [list(mejor_cromosoma_global)]
@@ -281,7 +277,7 @@ for generacion in range(1, numero_generaciones + 1):
         
     poblacion_actual = nueva_poblacion
 
-print(f"\nOptimizacion finalizada. Mejor exactitud alcanzada: {mejor_aptitud_global:.2f}%")
+print(f"\nExactitud final optimizada: {mejor_aptitud_global:.2f}%")
 
 # Guardamos el modelo optimizado
 cortes_optimizados, pesos_optimizados = decodificar_cromosoma(mejor_cromosoma_global)
@@ -310,7 +306,3 @@ plt.tight_layout()
 ruta_grafico_convergencia = os.path.join(carpeta_actual, "grafico_convergencia_ga.png")
 plt.savefig(ruta_grafico_convergencia, dpi=120)
 plt.close()
-
-print("\nArchivos generados en Fase_4_Algoritmo_Genetico:")
-print("  - modelo_optimizado.json")
-print("  - grafico_convergencia_ga.png")

@@ -108,7 +108,6 @@ def inducir_reglas_prism(lista_clases, lista_caracteristicas, datos_completos):
     lista_reglas_descubiertas = []
     
     for clase_actual in lista_clases:
-        print(f"Induciendo reglas para calidad = {clase_actual}...")
         datos_restantes = datos_completos.copy()
         total_inicial_clase = (datos_restantes['calidad'] == clase_actual).sum()
         
@@ -166,38 +165,24 @@ def inducir_reglas_prism(lista_clases, lista_caracteristicas, datos_completos):
     return lista_reglas_descubiertas
 
 
-# 5. Ejecucion
+# 5. Ejecucion y guardado de reglas
 reglas_descubiertas = inducir_reglas_prism(categorias_calidad, columnas_caracteristicas, datos_entrenamiento)
-print("\nTotal de reglas PRISM descubiertas:", len(reglas_descubiertas))
 
-print("\nPrimeras reglas descubiertas:")
+ruta_guardar_reglas = os.path.join(carpeta_actual, "reglas_descubiertas.json")
+with open(ruta_guardar_reglas, "w") as archivo_json:
+    json.dump(reglas_descubiertas, archivo_json, indent=4)
 
+print(f"Total de reglas descubiertas por PRISM: {len(reglas_descubiertas)}")
+print("\nPrimeras reglas inducidas:")
 numero = 1
 for regla in reglas_descubiertas[:5]:
-    # 1. Obtenemos los valores de la regla paso a paso
     calidad = regla['consecuente']
     confianza = round(regla['confianza'] * 100, 1)
-    cobertura = regla['cobertura']
-    lift = regla['lift']
     
-    # 2. Construimos el texto del SI de forma simple
     partes_condiciones = []
     for variable, valor in regla['condiciones'].items():
         partes_condiciones.append(variable + " = " + valor)
     texto_si = " Y ".join(partes_condiciones)
     
-    # 3. Imprimimos de forma ordenada y facil de leer
-    print(f"  Regla {numero}:")
-    print(f"    SI {texto_si}")
-    print(f"    ENTONCES calidad = {calidad}")
-    print(f"    Metricas: Confianza = {confianza}%, Cobertura = {cobertura} vinos, Lift = {lift}")
-    print("")
+    print(f"  Regla {numero}: SI {texto_si} ENTONCES calidad = {calidad} (Confianza: {confianza}%)")
     numero = numero + 1
-
-# Guardamos las reglas en archivo JSON
-ruta_guardar_reglas = os.path.join(carpeta_actual, "reglas_descubiertas.json")
-with open(ruta_guardar_reglas, "w") as archivo_json:
-    json.dump(reglas_descubiertas, archivo_json, indent=4)
-
-print("\nReglas guardadas exitosamente en:")
-print("  - reglas_descubiertas.json")

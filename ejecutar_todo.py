@@ -15,14 +15,10 @@ lista_fases = [
     (os.path.join(carpeta_proyecto, "Fase_5_Evaluacion", "5_evaluacion_resultados.py"), "Fase 5: Evaluacion y comparativa de resultados"),
 ]
 
-print("=== Iniciando ejecucion completa de todas las fases ===")
-
 for ruta_script, nombre_fase in lista_fases:
     carpeta_fase = os.path.dirname(ruta_script)
-    print(f"\n>>> Corriendo {nombre_fase}...")
+    print(f"\n--- {nombre_fase} ---", flush=True)
     resultado = subprocess.run([sys.executable, ruta_script], cwd=carpeta_fase)
     if resultado.returncode != 0:
-        print(f"Error al ejecutar {nombre_fase}. Deteniendo proceso.")
+        print(f"Error al ejecutar {nombre_fase}")
         sys.exit(1)
-
-print("\n=== Todas las fases terminaron exitosamente ===")

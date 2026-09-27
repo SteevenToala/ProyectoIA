@@ -270,60 +270,20 @@ pertenencia_alto = calcular_pertenencia_alta
 # 7. DEMOSTRACION SECUENCIAL EN UN VINO DE PRUEBA
 # =============================================================================
 if __name__ == "__main__":
-    print("=== Fase 3: Sistema de Inferencia Difusa (Mamdani) ===")
-    print("Total de reglas PRISM cargadas:", len(lista_reglas_prism))
-    print(f"Vinos en entrenamiento: {len(datos_entrenamiento)} | Vinos en prueba: {len(datos_prueba)}")
-    
-    # Tomamos el primer vino del conjunto de prueba
+    # Evaluamos un vino de ejemplo
     vino_de_prueba = datos_prueba.iloc[0]
-    print(f"\n--- Probando Vino 1 (Calidad Real: {vino_de_prueba['calidad']}) ---")
-    print(f"Propiedades quimicas:")
-    print(f"  Alcohol:         {vino_de_prueba['alcohol']}%")
-    print(f"  Acidez Volatil:  {vino_de_prueba['acidez_volatil']} g/dm3")
-    print(f"  Sulfatos:        {vino_de_prueba['sulfatos']} g/dm3")
-    print(f"  pH:              {vino_de_prueba['ph']}")
+    calidad_predicha, _, _ = evaluar_vino_completo(
+        vino_de_prueba, cortes_quimicos, lista_reglas_prism, pesos_reglas_iniciales
+    )
+    print(f"Ejemplo Vino #1 -> Calidad Real: {vino_de_prueba['calidad']} | Prediccion Difusa: {calidad_predicha}")
     
-    # [Paso 1] Fuzzificacion
-    grados_obtenidos = fuzzificar_vino(vino_de_prueba, cortes_quimicos)
-    print("\n[Paso 1] Fuzzificacion:")
-    for caracteristica, grados in grados_obtenidos.items():
-        print(f"  {caracteristica:15s} -> Bajo={grados['bajo']:.2f}, Medio={grados['medio']:.2f}, Alto={grados['alto']:.2f}")
-        
-    # [Paso 2] Inferencia
-    disparos_obtenidos = inferencia_mamdani_vino(grados_obtenidos, lista_reglas_prism, pesos_reglas_iniciales)
-    disparos_obtenidos.sort(key=lambda d: d['impacto'], reverse=True)
-    print("\n[Paso 2] Inferencia (Reglas que mas se activaron):")
-    for disparo in disparos_obtenidos[:3]:
-        partes_texto = []
-        for variable, valor in disparo['condiciones'].items():
-            partes_texto.append(variable + " = " + valor)
-        texto_si = " Y ".join(partes_texto)
-        
-        calidad = disparo['calidad_consecuente']
-        fuerza = round(disparo['fuerza_disparo'], 2)
-        impacto = round(disparo['impacto'], 3)
-        print(f"  SI {texto_si} -> Calidad = {calidad} (Fuerza = {fuerza}, Impacto = {impacto})")
-        
-    # [Paso 3] Agregacion
-    puntajes_obtenidos = agregar_impactos_por_calidad(disparos_obtenidos)
-    print("\n[Paso 3] Agregacion difusa por calidad:")
-    for calidad, puntaje in puntajes_obtenidos.items():
-        print(f"  Puntaje {calidad:5s}: {puntaje:.3f}")
-        
-    # [Paso 4] Defuzzificacion
-    calidad_predicha, certidumbre, calificacion_continua = defuzzificar_calidad(puntajes_obtenidos)
-    print("\n[Paso 4] Defuzzificacion:")
-    print(f"  Clase predicha por Maxima Pertenencia: [{calidad_predicha}] ({certidumbre}% de certidumbre)")
-    print(f"  Calificacion continua por Centroide CoG: {calificacion_continua:.2f} / 10")
-    
-    # Evaluacion global del dataset
+    # Evaluacion global del modelo difuso inicial
     exactitud_entrenamiento = calcular_exactitud_dataset(
         datos_entrenamiento, cortes_quimicos, lista_reglas_prism, pesos_reglas_iniciales
     )
     exactitud_prueba = calcular_exactitud_dataset(
         datos_prueba, cortes_quimicos, lista_reglas_prism, pesos_reglas_iniciales
     )
-    
-    print("\nExactitud global preliminar con cortes por cuantiles:")
+    print(f"\nExactitud del Sistema Difuso (cortes iniciales):")
     print(f"  Entrenamiento: {exactitud_entrenamiento}%")
     print(f"  Prueba:        {exactitud_prueba}%")

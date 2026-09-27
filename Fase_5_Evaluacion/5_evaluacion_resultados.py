@@ -24,8 +24,6 @@ calcular_pertenencia_baja = modulo_difusa.calcular_pertenencia_baja
 calcular_pertenencia_media = modulo_difusa.calcular_pertenencia_media
 calcular_pertenencia_alta = modulo_difusa.calcular_pertenencia_alta
 
-print("=== Fase 5: Evaluacion y Comparativa de Modelos ===")
-
 # 1. Cargamos los datos de prueba y entrenamiento
 ruta_train = os.path.join(carpeta_proyecto, "Fase_1_Preparacion", "datos_train.csv")
 ruta_test = os.path.join(carpeta_proyecto, "Fase_1_Preparacion", "datos_test.csv")
@@ -92,15 +90,7 @@ exactitud_opt_test = calcular_exactitud_dataset(
     datos_prueba, cortes_optimizados, lista_reglas, pesos_optimizados
 )
 
-# 5. Tabla comparativa final
-print("\nTabla comparativa de resultados:")
-print("-" * 65)
-print(f"{'Enfoque / Modelo':<35} | {'Train Acc':<12} | {'Test Acc':<12}")
-print("-" * 65)
-print(f"{'1. PRISM (reglas rigidas)':<35} | {exactitud_prism_train:>9.2f}% | {exactitud_prism_test:>9.2f}%")
-print(f"{'2. Logica Difusa (cuantiles)':<35} | {exactitud_difuso_train:>9.2f}% | {exactitud_difuso_test:>9.2f}%")
-print(f"{'3. Logica Difusa + Alg. Genetico':<35} | {exactitud_opt_train:>9.2f}% | {exactitud_opt_test:>9.2f}%")
-print("-" * 65)
+# 5. Generacion de graficos comparativos
 
 
 # --- Grafico 1: Barras comparativas Train vs Test y curva del AG ---
@@ -254,7 +244,11 @@ ruta_grafico_funciones = os.path.join(carpeta_actual, "grafico_funciones_pertene
 plt.savefig(ruta_grafico_funciones, dpi=130)
 plt.close()
 
-print("\nGraficos generados correctamente en Fase_5_Evaluacion/:")
-print("  - grafico_comparativa.png")
-print("  - grafico_matrices_confusion.png")
-print("  - grafico_funciones_pertenencia.png")
+print("\nTabla comparativa de resultados:")
+print("-" * 65)
+print(f"{'Enfoque / Modelo':<35} | {'Train Acc':<12} | {'Test Acc':<12}")
+print("-" * 65)
+print(f"{'1. PRISM (reglas rigidas)':<35} | {exactitud_prism_train:>9.2f}% | {exactitud_prism_test:>9.2f}%")
+print(f"{'2. Logica Difusa (cuantiles)':<35} | {exactitud_difuso_train:>9.2f}% | {exactitud_difuso_test:>9.2f}%")
+print(f"{'3. Logica Difusa + Alg. Genetico':<35} | {exactitud_opt_train:>9.2f}% | {exactitud_opt_test:>9.2f}%")
+print("-" * 65)
