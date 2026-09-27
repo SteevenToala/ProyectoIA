@@ -293,9 +293,16 @@ if __name__ == "__main__":
     disparos_obtenidos = inferencia_mamdani_vino(grados_obtenidos, lista_reglas_prism, pesos_reglas_iniciales)
     disparos_obtenidos.sort(key=lambda d: d['impacto'], reverse=True)
     print("\n[Paso 2] Inferencia (Reglas que mas se activaron):")
-    for d in disparos_obtenidos[:3]:
-        condiciones_texto = " AND ".join([f"{k}={v}" for k, v in d['condiciones'].items()])
-        print(f"  SI {condiciones_texto} -> Calidad={d['calidad_consecuente']} (Fuerza={d['fuerza_disparo']:.2f}, Impacto={d['impacto']:.3f})")
+    for disparo in disparos_obtenidos[:3]:
+        partes_texto = []
+        for variable, valor in disparo['condiciones'].items():
+            partes_texto.append(variable + " = " + valor)
+        texto_si = " Y ".join(partes_texto)
+        
+        calidad = disparo['calidad_consecuente']
+        fuerza = round(disparo['fuerza_disparo'], 2)
+        impacto = round(disparo['impacto'], 3)
+        print(f"  SI {texto_si} -> Calidad = {calidad} (Fuerza = {fuerza}, Impacto = {impacto})")
         
     # [Paso 3] Agregacion
     puntajes_obtenidos = agregar_impactos_por_calidad(disparos_obtenidos)

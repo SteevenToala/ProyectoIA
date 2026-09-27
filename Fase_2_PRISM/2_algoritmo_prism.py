@@ -8,14 +8,12 @@ import pandas as pd
 carpeta_actual = os.path.dirname(os.path.abspath(__file__))
 carpeta_proyecto = os.path.abspath(os.path.join(carpeta_actual, ".."))
 
-print("=== Fase 2: Algoritmo PRISM para el Vino ===")
 
 # 1. Cargamos los datos de entrenamiento preparados en la Fase 1
 ruta_datos_train = os.path.join(carpeta_proyecto, "Fase_1_Preparacion", "datos_train.csv")
 datos_entrenamiento = pd.read_csv(ruta_datos_train)
 total_vinos_entrenamiento = len(datos_entrenamiento)
 
-print("Total de vinos de entrenamiento cargados:", total_vinos_entrenamiento)
 
 # Caracteristicas discretizadas que usara PRISM
 columnas_caracteristicas = ['alcohol_discreto', 'acidez_discreto', 'sulfatos_discreto', 'ph_discreto']
@@ -173,9 +171,28 @@ reglas_descubiertas = inducir_reglas_prism(categorias_calidad, columnas_caracter
 print("\nTotal de reglas PRISM descubiertas:", len(reglas_descubiertas))
 
 print("\nPrimeras reglas descubiertas:")
-for numero_regla, regla in enumerate(reglas_descubiertas[:5], 1):
-    condiciones_texto = " AND ".join([f"{var}={val}" for var, val in regla['condiciones'].items()])
-    print(f"  Regla {numero_regla}: SI {condiciones_texto} ENTONCES calidad={regla['consecuente']} (confianza: {regla['confianza']*100:.1f}%, cobertura: {regla['cobertura']}, lift: {regla['lift']})")
+
+numero = 1
+for regla in reglas_descubiertas[:5]:
+    # 1. Obtenemos los valores de la regla paso a paso
+    calidad = regla['consecuente']
+    confianza = round(regla['confianza'] * 100, 1)
+    cobertura = regla['cobertura']
+    lift = regla['lift']
+    
+    # 2. Construimos el texto del SI de forma simple
+    partes_condiciones = []
+    for variable, valor in regla['condiciones'].items():
+        partes_condiciones.append(variable + " = " + valor)
+    texto_si = " Y ".join(partes_condiciones)
+    
+    # 3. Imprimimos de forma ordenada y facil de leer
+    print(f"  Regla {numero}:")
+    print(f"    SI {texto_si}")
+    print(f"    ENTONCES calidad = {calidad}")
+    print(f"    Metricas: Confianza = {confianza}%, Cobertura = {cobertura} vinos, Lift = {lift}")
+    print("")
+    numero = numero + 1
 
 # Guardamos las reglas en archivo JSON
 ruta_guardar_reglas = os.path.join(carpeta_actual, "reglas_descubiertas.json")

@@ -58,8 +58,15 @@ def predecir_calidad_de_un_vino(alcohol, acidez_volatil, sulfatos, ph, nombre_de
     
     print("\n[Paso 2] Inferencia (Reglas que mas aportaron):")
     for disparo in disparos[:3]:
-        condiciones_texto = " AND ".join([f"{k}={v}" for k, v in disparo['condiciones'].items()])
-        print(f"  SI {condiciones_texto} -> Calidad={disparo['calidad_consecuente']} (Fuerza={disparo['fuerza_disparo']:.2f}, Impacto={disparo['impacto']:.3f})")
+        partes_texto = []
+        for variable, valor in disparo['condiciones'].items():
+            partes_texto.append(variable + " = " + valor)
+        texto_si = " Y ".join(partes_texto)
+        
+        calidad = disparo['calidad_consecuente']
+        fuerza = round(disparo['fuerza_disparo'], 2)
+        impacto = round(disparo['impacto'], 3)
+        print(f"  SI {texto_si} -> Calidad = {calidad} (Fuerza = {fuerza}, Impacto = {impacto})")
         
     # Paso 3: Agregacion difusa
     puntajes = agregar_impactos_por_calidad(disparos)
