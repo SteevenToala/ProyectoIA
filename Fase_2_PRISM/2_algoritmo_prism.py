@@ -159,8 +159,11 @@ def inducir_reglas_prism(lista_clases, lista_caracteristicas, datos_completos):
             }
             lista_reglas_descubiertas.append(regla_informacion)
             
-            # Principio de recubrimiento: eliminamos los vinos de esa clase ya cubiertos
-            datos_restantes = datos_restantes[~(mascara_filtro & (datos_restantes['calidad'] == clase_actual))]
+            # Principio de recubrimiento secuencial:
+            # Quitamos los vinos que esta regla ya cubrio para que la siguiente regla aprenda con los que faltan
+            vinos_ya_cubiertos = mascara_filtro & (datos_restantes['calidad'] == clase_actual)
+            indices_cubiertos = datos_restantes[vinos_ya_cubiertos].index
+            datos_restantes = datos_restantes.drop(indices_cubiertos)
             
     return lista_reglas_descubiertas
 
