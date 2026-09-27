@@ -2,8 +2,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "alto",
-            "volatile acidity": "bajo"
+            "sulfatos": "alto",
+            "acidez_volatil": "bajo"
         },
         "consecuente": "ALTA",
         "confianza": 0.5593,
@@ -15,8 +15,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "pH": "bajo",
-            "sulphates": "medio"
+            "ph": "bajo",
+            "sulfatos": "medio"
         },
         "consecuente": "ALTA",
         "confianza": 0.4828,
@@ -28,8 +28,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "alto",
-            "volatile acidity": "medio"
+            "sulfatos": "alto",
+            "acidez_volatil": "medio"
         },
         "consecuente": "ALTA",
         "confianza": 0.3654,
@@ -40,9 +40,9 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "bajo",
+            "acidez_volatil": "bajo",
             "alcohol": "medio",
-            "sulphates": "alto"
+            "sulfatos": "alto"
         },
         "consecuente": "ALTA",
         "confianza": 0.3115,
@@ -54,8 +54,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "pH": "medio",
-            "volatile acidity": "alto"
+            "ph": "medio",
+            "acidez_volatil": "alto"
         },
         "consecuente": "ALTA",
         "confianza": 0.3077,
@@ -67,8 +67,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "bajo",
-            "pH": "medio"
+            "sulfatos": "bajo",
+            "ph": "medio"
         },
         "consecuente": "ALTA",
         "confianza": 0.2857,
@@ -80,8 +80,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "volatile acidity": "alto",
-            "sulphates": "alto"
+            "acidez_volatil": "alto",
+            "sulfatos": "alto"
         },
         "consecuente": "ALTA",
         "confianza": 0.2273,
@@ -93,8 +93,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "medio",
-            "pH": "medio"
+            "sulfatos": "medio",
+            "ph": "medio"
         },
         "consecuente": "ALTA",
         "confianza": 0.2222,
@@ -106,8 +106,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "sulphates": "medio",
-            "pH": "bajo"
+            "sulfatos": "medio",
+            "ph": "bajo"
         },
         "consecuente": "ALTA",
         "confianza": 0.1395,
@@ -119,8 +119,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "bajo",
-            "pH": "bajo"
+            "sulfatos": "bajo",
+            "ph": "bajo"
         },
         "consecuente": "ALTA",
         "confianza": 0.24,
@@ -131,9 +131,9 @@
     },
     {
         "condiciones": {
-            "pH": "alto",
+            "ph": "alto",
             "alcohol": "medio",
-            "volatile acidity": "medio"
+            "acidez_volatil": "medio"
         },
         "consecuente": "ALTA",
         "confianza": 0.1163,
@@ -144,9 +144,9 @@
     },
     {
         "condiciones": {
-            "pH": "alto",
+            "ph": "alto",
             "alcohol": "alto",
-            "sulphates": "medio"
+            "sulfatos": "medio"
         },
         "consecuente": "ALTA",
         "confianza": 0.0727,
@@ -158,8 +158,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "sulphates": "alto",
-            "volatile acidity": "alto"
+            "sulfatos": "alto",
+            "acidez_volatil": "alto"
         },
         "consecuente": "ALTA",
         "confianza": 0.16,
@@ -171,8 +171,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "medio",
-            "pH": "medio"
+            "sulfatos": "medio",
+            "ph": "medio"
         },
         "consecuente": "MEDIA",
         "confianza": 0.5714,
@@ -184,8 +184,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "pH": "alto",
-            "sulphates": "medio"
+            "ph": "alto",
+            "sulfatos": "medio"
         },
         "consecuente": "MEDIA",
         "confianza": 0.5455,
@@ -196,9 +196,9 @@
     },
     {
         "condiciones": {
-            "sulphates": "alto",
-            "volatile acidity": "medio",
-            "pH": "alto"
+            "sulfatos": "alto",
+            "acidez_volatil": "medio",
+            "ph": "alto"
         },
         "consecuente": "MEDIA",
         "confianza": 0.5714,
@@ -210,8 +210,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "volatile acidity": "medio",
-            "pH": "bajo"
+            "acidez_volatil": "medio",
+            "ph": "bajo"
         },
         "consecuente": "MEDIA",
         "confianza": 0.6,
@@ -222,8 +222,8 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "bajo",
-            "pH": "medio",
+            "acidez_volatil": "bajo",
+            "ph": "medio",
             "alcohol": "medio"
         },
         "consecuente": "MEDIA",
@@ -235,9 +235,9 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "bajo",
-            "pH": "alto",
-            "sulphates": "bajo"
+            "acidez_volatil": "bajo",
+            "ph": "alto",
+            "sulfatos": "bajo"
         },
         "consecuente": "MEDIA",
         "confianza": 0.6,
@@ -248,8 +248,8 @@
     },
     {
         "condiciones": {
-            "pH": "medio",
-            "sulphates": "alto",
+            "ph": "medio",
+            "sulfatos": "alto",
             "alcohol": "bajo"
         },
         "consecuente": "MEDIA",
@@ -261,8 +261,8 @@
     },
     {
         "condiciones": {
-            "sulphates": "medio",
-            "pH": "medio",
+            "sulfatos": "medio",
+            "ph": "medio",
             "alcohol": "medio"
         },
         "consecuente": "MEDIA",
@@ -274,9 +274,9 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "bajo",
-            "pH": "bajo",
-            "sulphates": "medio"
+            "acidez_volatil": "bajo",
+            "ph": "bajo",
+            "sulfatos": "medio"
         },
         "consecuente": "MEDIA",
         "confianza": 0.4407,
@@ -287,9 +287,9 @@
     },
     {
         "condiciones": {
-            "sulphates": "alto",
+            "sulfatos": "alto",
             "alcohol": "alto",
-            "volatile acidity": "alto"
+            "acidez_volatil": "alto"
         },
         "consecuente": "MEDIA",
         "confianza": 0.48,
@@ -300,9 +300,9 @@
     },
     {
         "condiciones": {
-            "sulphates": "alto",
-            "volatile acidity": "bajo",
-            "pH": "bajo"
+            "sulfatos": "alto",
+            "acidez_volatil": "bajo",
+            "ph": "bajo"
         },
         "consecuente": "MEDIA",
         "confianza": 0.4045,
@@ -313,9 +313,9 @@
     },
     {
         "condiciones": {
-            "pH": "medio",
+            "ph": "medio",
             "alcohol": "alto",
-            "volatile acidity": "medio"
+            "acidez_volatil": "medio"
         },
         "consecuente": "MEDIA",
         "confianza": 0.5714,
@@ -326,9 +326,9 @@
     },
     {
         "condiciones": {
-            "pH": "medio",
+            "ph": "medio",
             "alcohol": "alto",
-            "sulphates": "bajo"
+            "sulfatos": "bajo"
         },
         "consecuente": "MEDIA",
         "confianza": 0.4762,
@@ -339,8 +339,8 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "medio",
-            "sulphates": "medio",
+            "acidez_volatil": "medio",
+            "sulfatos": "medio",
             "alcohol": "bajo"
         },
         "consecuente": "MEDIA",
@@ -353,8 +353,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "volatile acidity": "medio",
-            "pH": "alto"
+            "acidez_volatil": "medio",
+            "ph": "alto"
         },
         "consecuente": "MEDIA",
         "confianza": 0.3947,
@@ -366,8 +366,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "bajo",
-            "pH": "bajo"
+            "sulfatos": "bajo",
+            "ph": "bajo"
         },
         "consecuente": "MEDIA",
         "confianza": 0.48,
@@ -378,8 +378,8 @@
     },
     {
         "condiciones": {
-            "pH": "medio",
-            "sulphates": "alto",
+            "ph": "medio",
+            "sulfatos": "alto",
             "alcohol": "alto"
         },
         "consecuente": "MEDIA",
@@ -392,8 +392,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "pH": "medio",
-            "sulphates": "bajo"
+            "ph": "medio",
+            "sulfatos": "bajo"
         },
         "consecuente": "MEDIA",
         "confianza": 0.4035,
@@ -404,8 +404,8 @@
     },
     {
         "condiciones": {
-            "pH": "alto",
-            "volatile acidity": "bajo",
+            "ph": "alto",
+            "acidez_volatil": "bajo",
             "alcohol": "bajo"
         },
         "consecuente": "MEDIA",
@@ -417,9 +417,9 @@
     },
     {
         "condiciones": {
-            "pH": "alto",
-            "volatile acidity": "bajo",
-            "sulphates": "alto"
+            "ph": "alto",
+            "acidez_volatil": "bajo",
+            "sulfatos": "alto"
         },
         "consecuente": "MEDIA",
         "confianza": 0.3556,
@@ -430,8 +430,8 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "alto",
-            "sulphates": "medio",
+            "acidez_volatil": "alto",
+            "sulfatos": "medio",
             "alcohol": "bajo"
         },
         "consecuente": "MEDIA",
@@ -443,9 +443,9 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "alto",
+            "acidez_volatil": "alto",
             "alcohol": "medio",
-            "sulphates": "alto"
+            "sulfatos": "alto"
         },
         "consecuente": "MEDIA",
         "confianza": 0.36,
@@ -456,8 +456,8 @@
     },
     {
         "condiciones": {
-            "sulphates": "bajo",
-            "pH": "alto",
+            "sulfatos": "bajo",
+            "ph": "alto",
             "alcohol": "alto"
         },
         "consecuente": "MEDIA",
@@ -469,9 +469,9 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "medio",
-            "sulphates": "alto",
-            "pH": "bajo"
+            "acidez_volatil": "medio",
+            "sulfatos": "alto",
+            "ph": "bajo"
         },
         "consecuente": "MEDIA",
         "confianza": 0.381,
@@ -483,8 +483,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "pH": "alto",
-            "sulphates": "medio"
+            "ph": "alto",
+            "sulfatos": "medio"
         },
         "consecuente": "MEDIA",
         "confianza": 0.2333,
@@ -495,9 +495,9 @@
     },
     {
         "condiciones": {
-            "sulphates": "bajo",
+            "sulfatos": "bajo",
             "alcohol": "bajo",
-            "pH": "medio"
+            "ph": "medio"
         },
         "consecuente": "MEDIA",
         "confianza": 0.1625,
@@ -508,8 +508,8 @@
     },
     {
         "condiciones": {
-            "sulphates": "bajo",
-            "pH": "bajo",
+            "sulfatos": "bajo",
+            "ph": "bajo",
             "alcohol": "medio"
         },
         "consecuente": "MEDIA",
@@ -533,8 +533,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "volatile acidity": "alto",
-            "pH": "alto"
+            "acidez_volatil": "alto",
+            "ph": "alto"
         },
         "consecuente": "BAJA",
         "confianza": 0.7121,
@@ -545,9 +545,9 @@
     },
     {
         "condiciones": {
-            "sulphates": "bajo",
+            "sulfatos": "bajo",
             "alcohol": "medio",
-            "volatile acidity": "alto"
+            "acidez_volatil": "alto"
         },
         "consecuente": "BAJA",
         "confianza": 0.6047,
@@ -559,8 +559,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "volatile acidity": "medio",
-            "sulphates": "bajo"
+            "acidez_volatil": "medio",
+            "sulfatos": "bajo"
         },
         "consecuente": "BAJA",
         "confianza": 0.5,
@@ -572,8 +572,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "sulphates": "medio",
-            "volatile acidity": "bajo"
+            "sulfatos": "medio",
+            "acidez_volatil": "bajo"
         },
         "consecuente": "BAJA",
         "confianza": 0.561,
@@ -584,9 +584,9 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "alto",
+            "acidez_volatil": "alto",
             "alcohol": "alto",
-            "sulphates": "bajo"
+            "sulfatos": "bajo"
         },
         "consecuente": "BAJA",
         "confianza": 0.6471,
@@ -598,8 +598,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "sulphates": "medio",
-            "volatile acidity": "alto"
+            "sulfatos": "medio",
+            "acidez_volatil": "alto"
         },
         "consecuente": "BAJA",
         "confianza": 0.375,
@@ -610,9 +610,9 @@
     },
     {
         "condiciones": {
-            "volatile acidity": "medio",
-            "pH": "alto",
-            "sulphates": "bajo"
+            "acidez_volatil": "medio",
+            "ph": "alto",
+            "sulfatos": "bajo"
         },
         "consecuente": "BAJA",
         "confianza": 0.4444,
@@ -624,8 +624,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "volatile acidity": "medio",
-            "sulphates": "alto"
+            "acidez_volatil": "medio",
+            "sulfatos": "alto"
         },
         "consecuente": "BAJA",
         "confianza": 0.4286,
@@ -636,9 +636,9 @@
     },
     {
         "condiciones": {
-            "sulphates": "medio",
-            "pH": "alto",
-            "volatile acidity": "medio"
+            "sulfatos": "medio",
+            "ph": "alto",
+            "acidez_volatil": "medio"
         },
         "consecuente": "BAJA",
         "confianza": 0.4,
@@ -650,8 +650,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "volatile acidity": "bajo",
-            "sulphates": "bajo"
+            "acidez_volatil": "bajo",
+            "sulfatos": "bajo"
         },
         "consecuente": "BAJA",
         "confianza": 0.4706,
@@ -663,8 +663,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "volatile acidity": "alto",
-            "pH": "bajo"
+            "acidez_volatil": "alto",
+            "ph": "bajo"
         },
         "consecuente": "BAJA",
         "confianza": 0.5,
@@ -676,8 +676,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "medio",
-            "volatile acidity": "alto"
+            "sulfatos": "medio",
+            "acidez_volatil": "alto"
         },
         "consecuente": "BAJA",
         "confianza": 0.3125,
@@ -689,8 +689,8 @@
     {
         "condiciones": {
             "alcohol": "medio",
-            "volatile acidity": "bajo",
-            "pH": "alto"
+            "acidez_volatil": "bajo",
+            "ph": "alto"
         },
         "consecuente": "BAJA",
         "confianza": 0.3333,
@@ -702,8 +702,8 @@
     {
         "condiciones": {
             "alcohol": "alto",
-            "sulphates": "bajo",
-            "pH": "bajo"
+            "sulfatos": "bajo",
+            "ph": "bajo"
         },
         "consecuente": "BAJA",
         "confianza": 0.25,

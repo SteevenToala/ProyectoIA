@@ -1,4 +1,4 @@
-alcohol,volatile acidity,sulphates,pH,calidad,alcohol_disc,volatile acidity_disc,sulphates_disc,pH_disc
+alcohol,acidez_volatil,sulfatos,ph,calidad,alcohol_discreto,acidez_discreto,sulfatos_discreto,ph_discreto
 9.4,0.7,0.56,3.51,BAJA,bajo,alto,bajo,alto
 9.8,0.88,0.68,3.2,BAJA,medio,alto,medio,bajo
 9.8,0.76,0.65,3.26,BAJA,medio,alto,medio,medio

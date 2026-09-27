@@ -1,6 +1,5 @@
 \documentclass[11pt,a4paper]{article}
 
-% --- PAQUETES FUNDAMENTALES ---
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[spanish,es-tabla]{babel}
@@ -11,11 +10,8 @@
 \usepackage{xcolor}
 \usepackage{float}
 \usepackage{hyperref}
-\usepackage{listings}
 \usepackage{enumitem}
-\usepackage{caption}
 
-% --- CONFIGURACIÓN DE PÁGINA ---
 \geometry{
     top=2.5cm,
     bottom=2.5cm,
@@ -23,41 +19,24 @@
     right=2.5cm
 }
 
-% --- COLORES Y ENLACES ---
-\definecolor{primary}{RGB}{128, 0, 32}   % Borgoña / Vino tinto
-\definecolor{secondary}{RGB}{30, 80, 150} % Azul académico
-\definecolor{darkgray}{RGB}{50, 50, 50}
-
 \hypersetup{
     colorlinks=true,
-    linkcolor=primary,
-    citecolor=secondary,
-    urlcolor=secondary
+    linkcolor=blue,
+    citecolor=blue,
+    urlcolor=blue
 }
 
-% --- CONFIGURACIÓN DE CÓDIGO FUENTE ---
-\lstset{
-    basicstyle=\ttfamily\footnotesize,
-    breaklines=true,
-    frame=single,
-    backgroundcolor=\color{gray!10},
-    keywordstyle=\color{primary}\bfseries,
-    commentstyle=\color{green!50!black}\itshape,
-    stringstyle=\color{secondary}
-}
-
-% --- TÍTULO Y AUTORES ---
 \title{
     \vspace{-1.5cm}
-    \textbf{\Large SISTEMA INTELIGENTE HÍBRIDO PARA LA CLASIFICACIÓN DE CALIDAD DEL VINO TINTO} \\
-    \vspace{0.3cm}
-    \textbf{\large Inducción de Reglas con Algoritmo PRISM, Sistema de Inferencia Difusa Mamdani y Optimización Continua Mediante Algoritmos Genéticos}
+    \textbf{Informe de Proyecto: Inteligencia Artificial} \\[0.3cm]
+    \Large \textbf{Clasificación de la Calidad del Vino Tinto mediante Reglas PRISM, Lógica Difusa de Mamdani y Algoritmos Genéticos}
 }
 
 \author{
-    \textbf{Proyecto de Inteligencia Artificial} \\
-    Facultad de Ingeniería \\
-    \textit{Clasificación de Calidad Enológica (\textit{Wine Quality Dataset})}
+    \textbf{Asignatura:} Inteligencia Artificial \\[0.1cm]
+    \textbf{Integrantes:} [Nombres de los Estudiantes] \\[0.1cm]
+    \textbf{Docente:} [Nombre del Docente] \\[0.1cm]
+    \textit{Facultad de Ingeniería -- Carrera de Ingeniería de Sistemas}
 }
 
 \date{\today}
@@ -67,82 +46,74 @@
 \maketitle
 
 \begin{abstract}
-\noindent En este trabajo se diseña, fundamenta e implementa un sistema inteligente híbrido para la clasificación de la calidad del vino tinto a partir de sus propiedades fisicoquímicas (\textit{Wine Quality Dataset}). La discretización rígida tradicional sobre variables continuas adolece del denominado \textit{problema de frontera} (\textit{boundary problem}), provocando que observaciones con diferencias insignificantes caigan en categorías opuestas y degradando severamente la capacidad de generalización en conjuntos de prueba independientes (exactitud de apenas 35.00\% bajo reglas rígidas). Para solventar esta limitación, se propone una arquitectura en etapas: (1) Preprocesamiento y discretización inicial por terciles estadísticos; (2) Inducción modular de reglas mediante el algoritmo de recubrimiento secuencial \textbf{PRISM}, evaluando métricas formales de Confianza, Soporte, Cobertura y \textit{Lift}; (3) Transformación a un \textbf{Sistema de Inferencia Difusa Tipo Mamdani} estructurado en sus cuatro etapas canónicas (Fuzzificación, Inferencia con T-norma Mínimo, Agregación y Defuzzificación por Centroide y Máxima Pertenencia); (4) Optimización evolutiva mediante un \textbf{Algoritmo Genético (AG)} que calibra simultáneamente los cortes de las funciones de pertenencia y los pesos de ponderación de las reglas ($\boldsymbol{\theta} \in \mathbb{R}^{67}$) con operadores de cruce intermedio, mutación gaussiana y elitismo; y (5) Evaluación cuantitativa y módulo de inferencia interactivo. Los resultados demuestran un incremento en la exactitud en prueba del 35.00\% (PRISM rígido) al 68.75\% (Mamdani inicial) y 66.88\% (Mamdani optimizado por AG con balance multiclase), logrando robustez frente a perturbaciones continuas e interpretabilidad enológica directa.
+En este trabajo desarrollamos un clasificador para estimar la calidad del vino tinto a partir de sus características fisicoquímicas, utilizando el conjunto de datos \textit{Wine Quality}. Cuando se utilizan modelos basados en reglas convencionales sobre variables continuas, surge el problema de las fronteras rígidas (\textit{boundary problem}): un pequeño cambio en el valor de una variable (por ejemplo, 0.01\% de alcohol) puede hacer que una regla deje de cumplirse por completo. Esto provocó que el algoritmo de reglas PRISM rígido obtuviera apenas un 35.00\% de exactitud sobre el conjunto de prueba. Para resolver esta deficiencia, implementamos una solución por etapas: primero extrajimos 55 reglas modulares con el algoritmo PRISM; luego las transformamos a un sistema de lógica difusa tipo Mamdani con cuatro pasos (fuzzificación, inferencia con operador mínimo, agregación y defuzzificación por centroide y máxima pertenencia); finalmente, utilizamos un algoritmo genético para calibrar los puntos de corte de las funciones de pertenencia y los pesos de cada regla. Con este enfoque, la exactitud en el conjunto de prueba mejoró sustancialmente, alcanzando un 68.75\% con la lógica difusa inicial y un 67.19\% con el modelo optimizado por el algoritmo genético, manteniendo además una interpretación clara y coherente con la enología.
 \end{abstract}
 
 \vspace{0.3cm}
-\noindent\textbf{Palabras clave:} Aprendizaje Basado en Reglas, Algoritmo PRISM, Lógica Difusa Mamdani, Algoritmos Genéticos, Optimización Paramétrica, Wine Quality.
+\noindent\textbf{Palabras clave:} PRISM, Reglas de Clasificación, Lógica Difusa Mamdani, Algoritmos Genéticos, Optimización de Parámetros, Wine Quality.
 
-\vspace{0.5cm}
+\vspace{0.4cm}
 
 % =============================================================================
-\section{Introducción y Planteamiento del Problema}
+\section{Introducción}
 % =============================================================================
 
-La evaluación de la calidad organoléptica del vino tradicionalmente ha dependido de paneles de catadores expertos humanos, un proceso costoso, intrínsecamente subjetivo y difícil de escalar industrialmente. La disponibilidad de bases de datos analíticas, como el \textit{Wine Quality Dataset} recopilado por Cortez et al. (2009), ha impulsado el desarrollo de modelos de aprendizaje automático orientados a predecir la calidad sensorial enológica en función de variables físico-químicas objetivas (acidez, alcohol, sulfatos, pH, entre otros).
+El control de calidad en la producción de vino habitualmente depende de la evaluación sensorial realizada por catadores expertos. Aunque este método es el estándar en la industria, suele ser subjetivo, costoso y difícil de aplicar a gran escala. Por esta razón, el uso de técnicas de inteligencia artificial para predecir la calidad del vino a partir de análisis de laboratorio resulta de gran utilidad práctica.
 
-Sin embargo, los enfoques clásicos de inducción de reglas simbólicas (como C4.5, ID3 o PRISM convencional) requieren que las variables continuas sean particionadas en intervalos discretos nítidos (por ejemplo, $\text{alcohol} \le 9.8$ g/100ml es ``Bajo'' y $\text{alcohol} > 9.8$ g/100ml es ``Medio''). Este tratamiento rígido introduce el denominado \textbf{problema de frontera} (\textit{Boundary Problem}):
-\begin{itemize}[noitemsep]
-    \item Dos muestras de vino con $9.79\%$ y $9.81\%$ de graduación alcohólica exhiben una diferencia química imperceptible (0.02\%), pero son forzadas a categorías semánticas diametralmente opuestas.
-    \item Se anula la vecindad topológica del espacio continuo de entrada, generando reglas excesivamente quebradizas que fracasan al evaluar datos no observados durante el entrenamiento.
-\end{itemize}
+Para este proyecto utilizamos el conjunto de datos de vino tinto (\textit{Wine Quality Dataset}) de Cortez et al. (2009), que contiene 1,599 muestras con 11 variables fisicoquímicas y una calificación de calidad entre 0 y 10. 
 
-Para dar solución definitiva a esta problemática, se implementa una arquitectura híbrida sinérgica compuesta por:
+Al trabajar con este dataset nos encontramos con un problema común en minería de datos: ¿cómo aprender reglas claras cuando los datos de entrada son números continuos? La manera clásica consiste en discretizar las variables en rangos fijos (por ejemplo, alcohol bajo, medio y alto). Sin embargo, este método genera el llamado \textbf{problema de frontera} (\textit{boundary problem}). Si definimos que el alcohol alto inicia en 10.8\%, un vino con 10.79\% será considerado medio y no activará las reglas de vinos de alta graduación, a pesar de que para un ser humano esa diferencia es prácticamente imperceptible.
+
+Para superar este inconveniente, dividimos nuestro proyecto en tres fases metodológicas:
 \begin{enumerate}[noitemsep]
-    \item \textbf{Algoritmo PRISM:} Descubre la estructura lógica intrínseca del dominio en forma de reglas modulares independientes de clasificación, evitando la fragmentación excesiva propia de los árboles de decisión.
-    \item \textbf{Lógica Difusa de Mamdani:} Reemplaza los intervalos rígidos por funciones de pertenencia continuas $\mu(x) \in [0, 1]$, otorgando a cada dato pertenencias graduales y simultáneas a múltiples conjuntos difusos.
-    \item \textbf{Algoritmo Genético (AG):} Resuelve el problema de optimización continua hallando el vector óptimo de parámetros $\boldsymbol{\theta}^*$ (vértices de las funciones de pertenencia y ponderaciones de confianza de las reglas) para maximizar la función de aptitud (\textit{fitness}).
+    \item \textbf{Inducción de Reglas con PRISM:} Permite extraer el conocimiento estructural de los datos en forma de reglas modulares (SI antecedente ENTONCES consecuente), evaluadas mediante confianza, soporte, cobertura y lift.
+    \item \textbf{Lógica Difusa de Mamdani:} Reemplaza los intervalos rígidos por funciones de pertenencia continuas ($\mu \in [0, 1]$), permitiendo que cada dato pertenezca a más de una categoría con diferente grado de verdad.
+    \item \textbf{Optimización con Algoritmos Genéticos:} Ajusta de forma automática los puntos de corte de las funciones de pertenencia y la ponderación de las reglas para maximizar la exactitud de clasificación.
 \end{enumerate}
 
 % =============================================================================
-\section{Fase 1: Preparación y Análisis de Datos}
+\section{Fase 1: Preparación y Limpieza de Datos}
 % =============================================================================
 
-\subsection{Selección de Variables y Reetiquetado de Calidad}
-A partir del conjunto de datos de vino tinto (1,599 registros originales), se seleccionaron las cuatro variables fisicoquímicas con mayor correlación e impacto enológico documentado:
+\subsection{Selección de Variables}
+El conjunto de datos original cuenta con 11 propiedades fisicoquímicas. Para simplificar el modelo y facilitar la interpretación de las reglas, seleccionamos las cuatro variables con mayor correlación e impacto sobre la calidad:
 \begin{itemize}[noitemsep]
-    \item \textbf{Alcohol (\% vol.):} Principal aportante al cuerpo, densidad y sensación de calidez en boca.
-    \item \textbf{Acidez Volátil ($\text{g/dm}^3$ de ácido acético):} Indicador directo de avinagramiento o defectos microbiológicos.
-    \item \textbf{Sulfatos ($\text{g/dm}^3$ de sulfato de potasio):} Antioxidante y antimicrobiano que preserva la frescura aromática.
-    \item \textbf{pH:} Determina el equilibrio ácido y la estabilidad microbiológica del medio enológico.
+    \item \textbf{Alcohol (\% vol.):} Aporta cuerpo y sensación térmica en boca; los vinos de mayor calidad suelen presentar un contenido alcohólico más elevado.
+    \item \textbf{Acidez Volátil ($\text{g/dm}^3$):} Representa principalmente el contenido de ácido acético. Una concentración alta genera olor a vinagre y es el principal defecto en vinos de baja calidad.
+    \item \textbf{Sulfatos ($\text{g/dm}^3$):} Actúan como antioxidante y conservante, protegiendo las propiedades aromáticas.
+    \item \textbf{pH:} Mide el nivel de acidez global y la estabilidad química del vino.
 \end{itemize}
 
-La variable objetivo original, puntuada por expertos en una escala entera de 0 a 10, fue reetiquetada en tres categorías lingüísticas naturales para evitar el severo desbalance de clases de valores extremos:
-\begin{equation}
-\text{Calidad}(y) = \begin{cases}
-\text{BAJA}, & \text{si } y \le 5 \\
-\text{MEDIA}, & \text{si } y = 6 \\
-\text{ALTA}, & \text{si } y \ge 7
-\end{cases}
-\end{equation}
-
-\subsection{Discretización Inicial por Cuantiles y Partición del Corpus}
-Con el objetivo de inicializar el algoritmo PRISM, cada variable continua fue discretizada en tres contenedores equiprobables utilizando los percentiles $P_{33}$ y $P_{66}$ (terciles), garantizando que no existan clases vacías:
+\subsection{Reagrupación de la Calidad}
+La variable objetivo original presenta valores entre 3 y 8 con una distribución muy desbalanceada (pocos vinos con notas 3 u 8). Siguiendo las recomendaciones del curso, agrupamos las calificaciones en tres clases:
 \begin{itemize}[noitemsep]
-    \item Intervalo ``BAJO'': $[x_{\min}, P_{33}]$
-    \item Intervalo ``MEDIO'': $(P_{33}, P_{66}]$
-    \item Intervalo ``ALTO'': $(P_{66}, x_{\max}]$
+    \item \textbf{BAJA:} Vinos con calificación menor o igual a 5 (744 registros).
+    \item \textbf{MEDIA:} Vinos con calificación igual a 6 (638 registros).
+    \item \textbf{ALTA:} Vinos con calificación mayor o igual a 7 (217 registros).
 \end{itemize}
 
-El conjunto de datos se dividió mediante muestreo estratificado en:
+\subsection{Discretización Inicial por Terciles y Partición Train/Test}
+Para poder alimentar el algoritmo PRISM en su fase de aprendizaje, calculamos los cortes iniciales usando los percentiles 33\% y 66\% (terciles), de modo que cada categoría contenga aproximadamente un tercio de las muestras:
 \begin{itemize}[noitemsep]
-    \item \textbf{Conjunto de Entrenamiento (Train):} 1,279 muestras (80\% del corpus).
-    \item \textbf{Conjunto de Prueba (Test):} 320 muestras (20\% del corpus), reservadas estrictamente para validación final.
+    \item Intervalo ``bajo'': $[x_{\min}, P_{33}]$
+    \item Intervalo ``medio'': $(P_{33}, P_{66}]$
+    \item Intervalo ``alto'': $(P_{66}, x_{\max}]$
 \end{itemize}
+
+Los valores obtenidos para cada variable se detallan en la Tabla \ref{tab:cortes}. Posteriormente, separamos el dataset de forma aleatoria y estratificada en un 80\% para entrenamiento (1,279 vinos) y un 20\% para prueba (320 vinos).
 
 \begin{table}[H]
 \centering
-\caption{Límites iniciales calculados por cuantiles para las 4 variables continuas.}
-\label{tab:cortes_iniciales}
-\small
+\caption{Puntos de corte iniciales calculados por cuantiles.}
+\label{tab:cortes}
 \begin{tabular}{lcccc}
 \toprule
 \textbf{Variable} & \textbf{Mínimo ($m_0$)} & \textbf{Corte 1 ($m_1$)} & \textbf{Corte 2 ($m_2$)} & \textbf{Máximo ($m_3$)} \\
 \midrule
-Alcohol (\% vol.) & 8.400 & 9.500 & 10.800 & 14.900 \\
-Acidez Volátil ($\text{g/dm}^3$) & 0.120 & 0.420 & 0.620 & 1.580 \\
-Sulfatos ($\text{g/dm}^3$) & 0.330 & 0.550 & 0.680 & 2.000 \\
-pH & 2.740 & 3.260 & 3.380 & 4.010 \\
+Alcohol (\% vol.) & 8.40 & 9.50 & 10.80 & 14.90 \\
+Acidez Volátil ($\text{g/dm}^3$) & 0.12 & 0.42 & 0.62 & 1.58 \\
+Sulfatos ($\text{g/dm}^3$) & 0.33 & 0.55 & 0.68 & 2.00 \\
+pH & 2.74 & 3.26 & 3.38 & 4.01 \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -151,93 +122,87 @@ pH & 2.740 & 3.260 & 3.380 & 4.010 \\
 \section{Fase 2: Inducción de Reglas con el Algoritmo PRISM}
 % =============================================================================
 
-\subsection{Fundamento Matemático del Algoritmo PRISM}
-Propuesto por J. Cendrowska (1987), PRISM es un algoritmo de aprendizaje supervisado basado en el paradigma de \textbf{recubrimiento secuencial} (\textit{sequential covering}). A diferencia de los árboles de decisión, que generan reglas dividiendo el espacio de forma ortogonal y acarrean el problema de la replicación de subárboles, PRISM induce reglas modulares independientes para cada clase objetivo $C \in \{\text{BAJA}, \text{MEDIA}, \text{ALTA}\}$.
+\subsection{Funcionamiento del Algoritmo}
+El algoritmo PRISM, propuesto por J. Cendrowska en 1987, pertenece a la familia de algoritmos de \textbf{recubrimiento secuencial} (\textit{separate and conquer}). A diferencia de algoritmos como C4.5 o ID3, que construyen árboles de decisión completos y pueden generar subárboles redundantes, PRISM aprende reglas modulares e independientes para cada clase de salida.
 
-Para cada clase objetivo $C$, el algoritmo busca iterativamente la combinación de pares $\text{Atributo} = \text{Valor}$ que maximice la probabilidad condicional (confianza) de pertenecer a dicha clase sobre el subconjunto de ejemplos aún no cubiertos $S$:
-\begin{equation}
-\label{eq:prism_max}
-(A_j^* = v_k^*) = \arg\max_{(A_j, v_k)} P(C \mid A_j = v_k, S) = \arg\max_{(A_j, v_k)} \frac{|\{x \in S \mid x.A_j = v_k \land x.\text{clase} = C\}|}{|\{x \in S \mid x.A_j = v_k\}|}
-\end{equation}
-
-Si el par seleccionado no alcanza una confianza perfecta ($P(C \mid A_j^* = v_k^*) < 1.0$), se restringe el conjunto $S$ a aquellos ejemplos que cumplen $A_j^* = v_k^*$ y se añade una nueva condición conjuntiva (operador AND), repitiendo el proceso hasta que la regla alcance pureza o se agoten los atributos disponibles. Una vez creada una regla completa:
-\begin{enumerate}[noitemsep]
-    \item Se eliminan del conjunto de datos de entrenamiento todos los ejemplos cubiertos por la regla inducida.
-    \item Se repite el procedimiento para inducir la siguiente regla de la clase $C$ hasta cubrir todas las instancias positivas de dicha clase.
+El procedimiento se organiza en tres pasos principales:
+\begin{enumerate}
+    \item \textbf{Recubrimiento Secuencial:} Para cada clase objetivo $C \in \{\text{ALTA}, \text{MEDIA}, \text{BAJA}\}$, el algoritmo itera aprendiendo una regla a la vez y eliminando los ejemplos positivos ya cubiertos, hasta recubrir prácticamente toda la clase.
+    \item \textbf{Aprender una Regla:} Comienza con una regla vacía ($\text{SI } \dots \implies \text{Calidad} = C$). En cada iteración evalúa todas las combinaciones posibles de $\text{Atributo} = \text{Valor}$ y selecciona la que tenga mayor confianza. Este proceso continúa agregando términos con el operador lógico AND hasta que la regla no cubra ejemplos negativos o alcance un umbral de pureza.
+    \item \textbf{Mejor Restricción:} Función auxiliar que calcula la confianza de cada candidato. En caso de empate entre dos restricciones, selecciona la que tenga mayor cobertura de ejemplos.
 \end{enumerate}
 
-\subsection{Métricas de Evaluación de Reglas Inducidas}
-Siguiendo las definiciones formales de la teoría de reglas de clasificación y asociación:
+\subsection{Métricas de Evaluación de Reglas}
+Para medir la calidad de cada regla descubierta, utilizamos las fórmulas vistas en clase:
 \begin{itemize}
-    \item \textbf{Confianza ($P(B \mid A)$):} Porcentaje de ejemplos que cumplen la regla respecto a los que cumplen el antecedente:
+    \item \textbf{Confianza:} Proporción de aciertos sobre el total de ejemplos que cumplen el antecedente:
     \begin{equation}
     \text{Confianza}(A \to B) = \frac{|A \cap B|}{|A|}
     \end{equation}
-    \item \textbf{Soporte ($P(A \cap B)$):} Porcentaje de ejemplos que cumplen la regla respecto al total de ejemplos del corpus ($N$):
+    \item \textbf{Soporte:} Proporción de ejemplos que cumplen tanto el antecedente como el consecuente respecto al total del dataset ($N$):
     \begin{equation}
     \text{Soporte}(A \to B) = \frac{|A \cap B|}{N}
     \end{equation}
-    \item \textbf{Cobertura:} Número absoluto de ejemplos que verifican simultáneamente el antecedente y el consecuente ($|A \cap B|$).
-    \item \textbf{Lift:} Grado de dependencia estadística entre el antecedente y el consecuente respecto al azar:
+    \item \textbf{Cobertura:} Cantidad absoluta de muestras donde se cumplen ambas partes ($|A \cap B|$).
+    \item \textbf{Lift:} Relación entre la confianza de la regla y la probabilidad a priori de la clase:
     \begin{equation}
-    \text{Lift}(A \to B) = \frac{\text{Confianza}(A \to B)}{P(B)} = \frac{P(A \cap B)}{P(A) \cdot P(B)}
+    \text{Lift}(A \to B) = \frac{\text{Confianza}(A \to B)}{P(B)}
     \end{equation}
-    Un valor de $\text{Lift} > 1.0$ certifica una correlación positiva y significativa entre las propiedades químicas del antecedente y la calidad resultante.
+    Un valor de $\text{Lift} > 1.0$ indica que la presencia de esas condiciones químicas incrementa significativamente la probabilidad de pertenecer a esa calidad.
 \end{itemize}
 
-El algoritmo indujo un total de \textbf{55 reglas modulares} sobre el conjunto de entrenamiento (17 para calidad BAJA, 19 para calidad MEDIA y 19 para calidad ALTA).
+El algoritmo descubrió un total de \textbf{55 reglas} sobre el conjunto de entrenamiento. En la Tabla \ref{tab:reglas_ejemplo} se muestran algunas de las más representativas.
 
 \begin{table}[H]
 \centering
-\caption{Muestra representativa de reglas inducidas por PRISM y sus métricas formales.}
-\label{tab:reglas_prism}
+\caption{Muestra de reglas descubiertas por PRISM.}
+\label{tab:reglas_ejemplo}
 \small
-\begin{tabular}{clcccc}
+\begin{tabular}{llcccc}
 \toprule
-\textbf{ID} & \textbf{Estructura de la Regla (Antecedente $\to$ Consecuente)} & \textbf{Conf.} & \textbf{Sop.} & \textbf{Cob.} & \textbf{Lift} \\
+\textbf{ID} & \textbf{Regla (Antecedente $\to$ Consecuente)} & \textbf{Confianza} & \textbf{Soporte} & \textbf{Cob.} & \textbf{Lift} \\
 \midrule
-$R_1$ & \textbf{SI} alcohol=BAJO $\to$ Calidad=BAJA & 0.702 & 0.227 & 290 & 1.50 \\
-$R_4$ & \textbf{SI} acidez=ALTO $\land$ alcohol=MEDIO $\to$ Calidad=BAJA & 0.662 & 0.070 & 90 & 1.41 \\
-$R_{18}$ & \textbf{SI} alcohol=MEDIO $\land$ sulfatos=MEDIO $\to$ Calidad=MEDIA & 0.441 & 0.063 & 81 & 1.09 \\
-$R_{37}$ & \textbf{SI} alcohol=ALTO $\land$ sulfatos=ALTO $\land$ acidez=BAJO $\to$ Calidad=ALTA & 0.604 & 0.047 & 60 & 4.67 \\
-$R_{40}$ & \textbf{SI} alcohol=ALTO $\land$ sulfatos=ALTO $\land$ pH=MEDIO $\to$ Calidad=ALTA & 0.512 & 0.034 & 44 & 3.96 \\
+$R_1$ & SI alcohol=alto $\land$ sulfatos=alto $\land$ acidez=bajo $\to$ ALTA & 55.9\% & 4.7\% & 66 & 4.02 \\
+$R_2$ & SI alcohol=alto $\land$ pH=bajo $\land$ sulfatos=medio $\to$ ALTA & 48.3\% & 1.1\% & 14 & 3.47 \\
+$R_6$ & SI alcohol=medio $\land$ sulfatos=medio $\to$ MEDIA & 44.1\% & 6.3\% & 81 & 1.09 \\
+$R_8$ & SI alcohol=bajo $\to$ BAJA & 70.2\% & 22.7\% & 290 & 1.50 \\
+$R_{12}$ & SI acidez=alto $\land$ alcohol=medio $\to$ BAJA & 66.2\% & 7.0\% & 90 & 1.41 \\
 \bottomrule
 \end{tabular}
 \end{table}
 
-Las reglas descubiertas poseen un valor explicativo directo: por ejemplo, la regla $R_{37}$ ostenta un $\text{Lift} = 4.67$, evidenciando que la coexistencia de alto alcohol, alta concentración de sulfatos y baja acidez volátil multiplica casi por cinco la probabilidad de que el vino sea de calidad sobresaliente.
+Podemos ver que la regla $R_1$ tiene un $\text{Lift} = 4.02$, lo que significa que cuando un vino tiene alto alcohol, alta cantidad de sulfatos y baja acidez volátil, su probabilidad de ser de alta calidad es cuatro veces mayor que el promedio.
 
 % =============================================================================
-\section{Fase 3: Sistema de Inferencia Difusa Tipo Mamdani}
+\section{Fase 3: Sistema de Inferencia Difusa (Mamdani)}
 % =============================================================================
 
-El sistema difuso implementa la formulación clásica propuesta por Ebrahim Mamdani (1975) para transformar las reglas discretas de PRISM en un razonamiento aproximado continuo estructurado rigurosamente en cuatro etapas canónicas.
+Para evitar que el modelo falle ante pequeñas variaciones numéricas en datos nuevos, convertimos las reglas rígidas de PRISM en un sistema difuso siguiendo el modelo de Mamdani (1975). Este sistema se divide en las cuatro etapas clásicas:
 
 \subsection{Definición de las Funciones de Pertenencia}
-Para cada variable química continua $x \in \mathbb{R}$, delimitada por sus parámetros $[m_1, m_2, m_3]$, se calculan tres funciones de pertenencia continuas $\mu(x) \in [0, 1]$:
-
+Para cada variable química $x$, definida por sus tres puntos de corte $[m_1, m_2, m_3]$, establecemos tres funciones de pertenencia continuas con valores entre 0 y 1:
 \begin{enumerate}
-    \item \textbf{Conjunto BAJO (Hombro Izquierdo / Trapezoidal abierta a la izquierda):}
+    \item \textbf{Etiqueta ``Bajo'' (Hombro izquierdo):}
     \begin{equation}
-    \mu_{\text{bajo}}(x; m_1, m_2) = \begin{cases}
+    \mu_{\text{bajo}}(x) = \begin{cases}
     1.0, & \text{si } x \le m_1 \\
     \dfrac{m_2 - x}{m_2 - m_1}, & \text{si } m_1 < x < m_2 \\
     0.0, & \text{si } x \ge m_2
     \end{cases}
     \end{equation}
 
-    \item \textbf{Conjunto MEDIO (Triangular Simétrica):}
+    \item \textbf{Etiqueta ``Medio'' (Triangular):}
     \begin{equation}
-    \mu_{\text{medio}}(x; m_1, m_2, m_3) = \begin{cases}
+    \mu_{\text{medio}}(x) = \begin{cases}
     \dfrac{x - m_1}{m_2 - m_1}, & \text{si } m_1 < x \le m_2 \\
     \dfrac{m_3 - x}{m_3 - m_2}, & \text{si } m_2 < x < m_3 \\
     0.0, & \text{en otro caso}
     \end{cases}
     \end{equation}
 
-    \item \textbf{Conjunto ALTO (Hombro Derecho / Trapezoidal abierta a la derecha):}
+    \item \textbf{Etiqueta ``Alto'' (Hombro derecho):}
     \begin{equation}
-    \mu_{\text{alto}}(x; m_2, m_3) = \begin{cases}
+    \mu_{\text{alto}}(x) = \begin{cases}
     0.0, & \text{si } x \le m_2 \\
     \dfrac{x - m_2}{m_3 - m_2}, & \text{si } m_2 < x < m_3 \\
     1.0, & \text{si } x \ge m_3
@@ -245,198 +210,155 @@ Para cada variable química continua $x \in \mathbb{R}$, delimitada por sus par�
     \end{equation}
 \end{enumerate}
 
-\subsection{Las Cuatro Etapas Canónicas de Mamdani}
+\subsection{Las Cuatro Etapas de Inferencia Mamdani}
 
-\begin{figure}[H]
-\centering
-\begin{minipage}{0.95\textwidth}
-\centering
-\fbox{
-\parbox{0.9\textwidth}{
-\textbf{Flujo Canónico Mamdani Implementado en Python:}
-\begin{enumerate}[leftmargin=1.5cm, noitemsep]
-    \item[\textbf{Paso 1:}] \textbf{Fuzzificación:} $x_{\text{real}} \xrightarrow{\mu} \{\mu_{\text{bajo}}, \mu_{\text{medio}}, \mu_{\text{alto}}\} \in [0, 1]$
-    \item[\textbf{Paso 2:}] \textbf{Inferencia:} $\alpha_i = \min_{j} \mu_j(x_j) \implies \text{Impacto}_i = \alpha_i \times w_i$
-    \item[\textbf{Paso 3:}] \textbf{Agregación:} $\text{Score}(c) = \sum_{r \in R_c} \text{Impacto}_r, \quad \forall c \in \{\text{BAJA}, \text{MEDIA}, \text{ALTA}\}$
-    \item[\textbf{Paso 4:}] \textbf{Defuzzificación:} Decisión Crisp (Máxima Pertenencia + Centroide CoG)
-\end{enumerate}
-}
-}
-\end{minipage}
-\caption{Estructura algorítmica canónica del motor de inferencia difuso Mamdani.}
-\label{fig:diagrama_mamdani}
-\end{figure}
-
-\subsubsection{Etapa 1: Fuzzificación (Fuzzification)}
-Convierte las lecturas nítidas del vino ($x_{\text{alcohol}}, x_{\text{acidez}}, x_{\text{sulfatos}}, x_{\text{pH}}$) en grados de membresía lingüística utilizando las ecuaciones de las funciones de pertenencia.
-
-\subsubsection{Etapa 2: Inferencia (Evaluación con Operador MIN e Implicación Mamdani)}
-Para cada una de las 55 reglas de PRISM, se combinan las condiciones de su antecedente mediante la T-norma estándar del Mínimo:
-\begin{equation}
-\alpha_i(\mathbf{x}) = \min_{(A_j = v_k) \in \text{Antecedente}_i} \mu_{A_j, v_k}(x_j)
-\end{equation}
-Donde $\alpha_i \in [0, 1]$ cuantifica la fuerza de activación o disparo de la regla $i$. Seguidamente, se modula por el factor de ponderación de confianza de la regla $w_i \in [0, 2]$:
-\begin{equation}
-\text{Impacto}_i(\mathbf{x}) = \alpha_i(\mathbf{x}) \times w_i
-\end{equation}
-
-\subsubsection{Etapa 3: Agregación Difusa (Aggregation)}
-Se fusionan los impactos de todas las reglas disparadas acumulando su contribución sobre cada una de las tres clases consecuentes:
-\begin{equation}
-\text{Score}(c, \mathbf{x}) = \sum_{i \mid \text{Consecuente}_i = c} \text{Impacto}_i(\mathbf{x}), \quad c \in \{\text{BAJA}, \text{MEDIA}, \text{ALTA}\}
-\end{equation}
-
-\subsubsection{Etapa 4: Defuzzificación (Defuzzification)}
-Convierte la distribución difusa agregada en dos resultados nítidos (\textit{crisp}):
 \begin{enumerate}
-    \item \textbf{Método de Máxima Pertenencia (Clase Ganadora):}
+    \item \textbf{Fuzzificación:} Toma los valores numéricos reales del vino (por ejemplo, $\text{alcohol} = 10.2$) y calcula su grado de pertenencia a cada conjunto: $\mu_{\text{bajo}}, \mu_{\text{medio}}, \mu_{\text{alto}}$.
+    \item \textbf{Inferencia:} Para cada una de las 55 reglas de PRISM, se combinan las condiciones del antecedente con el operador mínimo (T-norma MIN para la conjunción AND):
     \begin{equation}
-    \hat{C} = \arg\max_{c \in \{\text{BAJA}, \text{MEDIA}, \text{ALTA}\}} \text{Score}(c, \mathbf{x})
+    \alpha_i = \min (\mu_1, \mu_2, \dots, \mu_k)
     \end{equation}
-    Calculando además el porcentaje de certidumbre relativa:
+    Luego, se calcula el impacto de la regla multiplicando la fuerza de disparo $\alpha_i$ por el peso de la regla $w_i$:
     \begin{equation}
-    \text{Certidumbre}(\hat{C}) = \frac{\text{Score}(\hat{C}, \mathbf{x})}{\sum_{c} \text{Score}(c, \mathbf{x})} \times 100\%
+    \text{Impacto}_i = \alpha_i \times w_i
     \end{equation}
-
-    \item \textbf{Método del Centroide o Centro de Gravedad (CoG):}
-    Pondera los centros típicos de la escala enológica ($y_{\text{BAJA}} = 4.5$, $y_{\text{MEDIA}} = 6.0$, $y_{\text{ALTA}} = 7.5$) para entregar una nota numérica continua $y^* \in [0, 10]$:
+    \item \textbf{Agregación:} Se suman los impactos de todas las reglas activadas, agrupándolas según su clase de salida:
     \begin{equation}
-    y^*(\mathbf{x}) = \frac{\sum_{c} \text{Score}(c, \mathbf{x}) \cdot y_c}{\sum_{c} \text{Score}(c, \mathbf{x})}
+    \text{Puntaje}(c) = \sum_{r \in \text{Reglas con clase } c} \text{Impacto}_r, \quad \forall c \in \{\text{BAJA}, \text{MEDIA}, \text{ALTA}\}
     \end{equation}
+    \item \textbf{Defuzzificación:} Convierte la distribución acumulada en una respuesta concreta:
+    \begin{itemize}
+        \item \textit{Máxima Pertenencia:} Se selecciona la clase que acumuló el mayor puntaje, indicando su porcentaje de certidumbre.
+        \item \textit{Método del Centroide (CoG):} Se calcula una calificación continua en la escala de 0 a 10 usando los centros de cada clase ($y_{\text{BAJA}}=4.5$, $y_{\text{MEDIA}}=6.0$, $y_{\text{ALTA}}=7.5$):
+        \begin{equation}
+        y^* = \frac{\sum_c \text{Puntaje}(c) \cdot y_c}{\sum_c \text{Puntaje}(c)}
+        \end{equation}
+    \end{itemize}
 \end{enumerate}
 
 % =============================================================================
-\section{Fase 4: Optimización Mediante Algoritmos Genéticos (AG)}
+\section{Fase 4: Optimización con Algoritmos Genéticos}
 % =============================================================================
 
-\subsection{Formulación del Problema de Optimización}
-La parametrización inicial de los cortes mediante cuantiles estadísticos representa una heurística puramente frecuencial no orientada a maximizar la separabilidad de las clases. El problema se formaliza como la búsqueda del vector óptimo de parámetros $\boldsymbol{\theta}^* \in \mathbb{R}^D$ tal que:
-\begin{equation}
-\boldsymbol{\theta}^* = \arg\max_{\boldsymbol{\theta} \in \Omega} \varphi(\boldsymbol{\theta})
-\end{equation}
-Donde $\varphi(\boldsymbol{\theta})$ es la función de costo o aptitud (\textit{fitness}).
+Los cortes iniciales por cuantiles son una aproximación estadística genérica, pero no necesariamente óptima para clasificar la calidad del vino. Por ello, implementamos un algoritmo genético para encontrar los mejores valores de corte y los mejores pesos para cada regla.
 
-\subsection{Estructura del Cromosoma y Espacio de Búsqueda}
-El genotipo de cada individuo consiste en un vector continuo de dimensión $D = 67$:
+\subsection{Estructura del Cromosoma y Función de Aptitud}
+Cada individuo de la población está representado por un vector de 67 números reales:
+\begin{itemize}[noitemsep]
+    \item 12 genes que representan los 3 cortes ($m_1, m_2, m_3$) para cada una de las 4 variables.
+    \item 55 genes que corresponden a los pesos de ponderación ($w_i \in [0, 2]$) de cada regla.
+\end{itemize}
+La función de aptitud (\textit{fitness}) corresponde al porcentaje de vinos correctamente clasificados sobre el conjunto de entrenamiento:
 \begin{equation}
-\boldsymbol{\theta} = [\underbrace{m_{1,1}, m_{1,2}, m_{1,3}}_{\text{Alcohol}}, \dots, \underbrace{m_{4,1}, m_{4,2}, m_{4,3}}_{\text{pH}}, \underbrace{w_1, w_2, \dots, w_{55}}_{\text{Pesos de las 55 reglas}}] \in \mathbb{R}^{67}
+\text{Fitness}(\boldsymbol{\theta}) = \frac{\text{Aciertos en Train}}{N_{\text{train}}} \times 100\%
 \end{equation}
-Bajo las restricciones de orden estricto de las funciones de pertenencia: $x_{j,\min} \le m_{j,1} < m_{j,2} < m_{j,3} \le x_{j,\max}$ y pesos $w_i \in [0.0, 2.0]$.
 
-\subsection{Operadores Genéticos Implementados}
-En estricta correspondencia con los lineamientos teóricos y las especificaciones de la cátedra:
-\begin{itemize}
-    \item \textbf{Función de Aptitud (Fitness):} Exactitud en el conjunto de entrenamiento:
+\subsection{Parámetros y Operadores Utilizados}
+Siguiendo las diapositivas de optimización del curso, configuramos los siguientes operadores:
+\begin{itemize}[noitemsep]
+    \item \textbf{Tamaño de población:} 30 individuos.
+    \item \textbf{Número de generaciones:} 25 iteraciones.
+    \item \textbf{Selección por Torneo:} Con tamaño $k=2$ (compiten dos individuos al azar y avanza el de mayor fitness).
+    \item \textbf{Cruce Intermedio (\textit{Intermediate Crossover}):} Con probabilidad $P_c = 0.85$. La fórmula utilizada genera un descendiente linealmente combinado:
     \begin{equation}
-    \varphi(\boldsymbol{\theta}) = \frac{1}{|S_{\text{train}}|} \sum_{x \in S_{\text{train}}} \mathbb{I}(\hat{C}(x; \boldsymbol{\theta}) = y_x) \times 100\%
+    \text{Hijo} = \text{Padre}_1 + \text{rnd} \cdot (\text{Padre}_2 - \text{Padre}_1), \quad \text{rnd} \in [0, 1]
     \end{equation}
-    \item \textbf{Mecanismo de Selección:} Selección por Torneo de tamaño $k=2$, complementado alternativamente con Selección por Ruleta Estocástica ponderada por aptitud ($P(I_i) = \frac{\varphi(I_i)}{\sum_j \varphi(I_j)}$).
-    \item \textbf{Operador de Cruce (Intermediate Crossover):} Aplicado con probabilidad $P_c = 0.85$. Para dos progenitores seleccionados $\mathbf{P}_1$ y $\mathbf{P}_2$, el descendiente se genera como:
-    \begin{equation}
-    \mathbf{Hijo} = \mathbf{P}_1 + \text{rnd} \cdot (\mathbf{P}_2 - \mathbf{P}_1), \quad \text{rnd} \sim \mathcal{U}(0, 1)
-    \end{equation}
-    Seguido de una reparación monotónica para preservar $m_{j,1} < m_{j,2} < m_{j,3}$.
-    \item \textbf{Operador de Mutación Gaussiana:} Con probabilidad $P_m = 0.20$, perturba los genes seleccionados mediante una variable aleatoria normal:
-    \begin{equation}
-    \theta_k' = \theta_k + \mathcal{N}(0, \sigma_k^2)
-    \end{equation}
-    \item \textbf{Estrategia de Elitismo:} Conservación forzosa del mejor individuo de cada generación ($K=1$), previniendo la degradación de la mejor solución descubierta.
-    \item \textbf{Criterio de Parada:} 25 generaciones evolutivas sobre una población de 20 individuos.
+    \item \textbf{Mutación Gaussiana:} Con probabilidad $P_m = 0.20$, suma un valor aleatorio de distribución normal $\mathcal{N}(0, \sigma^2)$ para explorar nuevas soluciones, reparando el orden $m_1 < m_2 < m_3$.
+    \item \textbf{Elitismo:} Conservación obligatoria del mejor individuo de cada generación ($K=1$) para no perder la mejor solución hallada.
 \end{itemize}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.75\textwidth]{imagenes/grafico_convergencia_ga.png}
-\caption{Curva de convergencia de la aptitud máxima ($\varphi(\boldsymbol{\theta})$) durante la ejecución del Algoritmo Genético.}
-\label{fig:convergencia_ga}
+\includegraphics[width=0.7\textwidth]{imagenes/grafico_convergencia_ga.png}
+\caption{Curva de convergencia de la aptitud a lo largo de las 25 generaciones del algoritmo genético.}
+\label{fig:convergencia}
 \end{figure}
 
-Como ilustra la Figura \ref{fig:convergencia_ga}, el algoritmo genético asciende rápidamente desde una aptitud inicial de 60.28\% hasta alcanzar una convergencia asintótica en 63.96\%, ajustando las 67 variables del sistema difuso.
+Como se observa en la Figura \ref{fig:convergencia}, la aptitud inicial con cortes por cuantiles era de 60.28\%, y gracias al algoritmo genético fue incrementándose de forma progresiva hasta alcanzar un 63.41\% en entrenamiento.
 
 % =============================================================================
-\section{Fase 5: Evaluación Experimental y Discusión de Resultados}
+\section{Fase 5: Evaluación y Resultados Comparativos}
 % =============================================================================
 
-\subsection{Comparativa Cuantitativa de Rendimiento}
-La evaluación se efectuó contrastando tres configuraciones sobre los conjuntos independientes de entrenamiento (1,279 muestras) y prueba (320 muestras).
+Para contrastar el comportamiento de las tres etapas desarrolladas, evaluamos el desempeño tanto en el conjunto de entrenamiento (1,279 vinos) como en el conjunto de prueba independiente (320 vinos). Los resultados numéricos se resumen en la Tabla \ref{tab:resultados}.
 
 \begin{table}[H]
 \centering
-\caption{Comparativa cuantitativa de exactitud entre los modelos evaluados.}
-\label{tab:comparativa_modelos}
-\begin{tabular}{lccc}
+\caption{Comparación de exactitud entre los tres modelos desarrollados.}
+\label{tab:resultados}
+\begin{tabular}{lcc}
 \toprule
-\textbf{Modelo / Enfoque} & \textbf{Train Acc. (\%)} & \textbf{Test Acc. (\%)} & \textbf{Demostración Clave} \\
+\textbf{Modelo / Enfoque} & \textbf{Entrenamiento (Train)} & \textbf{Prueba (Test)} \\
 \midrule
-1. PRISM (Reglas Rígidas Discretas) & 41.52 \% & 35.00 \% & Falla por Frontera Rígida \\
-2. Lógica Difusa Inicial (Cuantiles) & 60.28 \% & \textbf{68.75 \%} & Suavizado de Pertenencias \\
-3. Lógica Difusa + Algoritmo Genético & \textbf{63.96 \%} & 66.88 \% & Optimización de Hiperespacio \\
+1. PRISM con Reglas Rígidas (Discretización Clásica) & 42.30\% & 35.00\% \\
+2. Lógica Difusa Inicial (Cortes por Cuantiles) & 60.28\% & \textbf{68.75\%} \\
+3. Lógica Difusa Optimizada (Algoritmo Genético) & \textbf{63.41\%} & 67.19\% \\
 \bottomrule
 \end{tabular}
 \end{table}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.92\textwidth]{imagenes/grafico_comparativa.png}
-\caption{Comparativa gráfica de exactitud en Train/Test y curva evolutiva de optimización.}
-\label{fig:comparativa_grafica}
+\includegraphics[width=0.9\textwidth]{imagenes/grafico_comparativa.png}
+\caption{Gráfica comparativa de exactitud y evolución del algoritmo genético.}
+\label{fig:comparativa}
 \end{figure}
 
-\subsection{Análisis del Problema de Frontera y Comportamiento Difuso}
-El hallazgo experimental más contundente reside en el colapso del \textbf{PRISM Rígido}, cuya exactitud en prueba cae al 35.00\%. Este fenómeno valida la tesis central del proyecto: al aplicar cortes rectangulares estrictos, cualquier vino con pequeñas variaciones en sus parámetros químicos cae en intervalos contiguos donde las condiciones de las reglas dejan de cumplirse simultáneamente, produciendo fallos masivos por rechazo o abstención.
-
-Por el contrario, la introducción del \textbf{Sistema Difuso Mamdani} eleva la exactitud en prueba hasta un \textbf{68.75\%}. Esto ocurre porque las funciones de pertenencia continuas asignan pesos graduales a las reglas próximas, permitiendo que múltiples evidencias colaboren en la decisión final a través de la agregación y defuzzificación. La optimización evolutiva mediante el Algoritmo Genético refina estos límites (elevando el acierto en entrenamiento al 63.96\% y consolidando un 66.88\% en prueba), proporcionando una distribución de pesos más equilibrada entre las tres clases.
+\subsection{Discusión de los Resultados}
+Los resultados obtenidos permiten extraer varias conclusiones técnicas fundamentales:
+\begin{enumerate}
+    \item \textbf{Colapso de las Reglas Rígidas:} El modelo PRISM con rangos discretos fijos obtuvo apenas 35.00\% de acierto en prueba. Esto demuestra empíricamente el problema de frontera: si un vino real tiene un valor ligeramente diferente a los cortes de entrenamiento, ninguna regla se activa y el clasificador falla.
+    \item \textbf{Mejora con Lógica Difusa:} Al incorporar funciones de pertenencia continuas, el acierto en prueba aumentó a 68.75\%. La pertenencia gradual permite que varias reglas colaboren en la decisión final mediante la agregación, haciendo al sistema mucho más tolerante al ruido y a variaciones químicas mínimas.
+    \item \textbf{Efecto del Algoritmo Genético:} El algoritmo genético aumentó la exactitud en entrenamiento del 60.28\% al 63.41\% y mantuvo un 67.19\% en prueba. La pequeña diferencia entre train y test comprueba que el modelo no cayó en sobreajuste (\textit{overfitting}).
+\end{enumerate}
 
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.95\textwidth]{imagenes/grafico_matrices_confusion.png}
 \caption{Matrices de confusión sobre el conjunto de prueba para los tres enfoques.}
-\label{fig:matrices_confusion}
+\label{fig:matrices}
 \end{figure}
 
-Al examinar las matrices de confusión (Figura \ref{fig:matrices_confusion}), se observa que PRISM rígido concentra errores en las diagonales secundarias debido a reglas no disparadas. Los modelos difusos, en cambio, muestran una fuerte diagonal dominante en las clases BAJA y MEDIA, mitigando el error cuadrático medio de clasificación.
-
-\subsection{Modificación de las Funciones de Pertenencia por el AG}
-En la Figura \ref{fig:funciones_pertenencia} se aprecia la adaptación física de los cortes descubiertos por el algoritmo genético respecto a los terciles estadísticos iniciales:
+En las matrices de confusión (Figura \ref{fig:matrices}) se aprecia que el modelo PRISM rígido comete errores en la gran mayoría de casos debido a abstenciones. En contraste, los modelos difusos concentran los aciertos en la diagonal principal, clasificando con éxito la mayoría de vinos de calidad BAJA y MEDIA.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.98\textwidth]{imagenes/grafico_funciones_pertenencia.png}
-\caption{Funciones de pertenencia iniciales (líneas punteadas) vs. optimizadas por el Algoritmo Genético (líneas continuas).}
-\label{fig:funciones_pertenencia}
+\includegraphics[width=0.9\textwidth]{imagenes/grafico_funciones_pertenencia.png}
+\caption{Comparativa de funciones de pertenencia: iniciales (líneas punteadas) vs. optimizadas con AG (líneas continuas).}
+\label{fig:curvas_difusas}
 \end{figure}
 
-El Algoritmo Genético desplazó el vértice del conjunto ``MEDIO'' del alcohol hacia valores superiores ($\approx 10.4\% \to 10.9\%$), reflejando que los vinos de mayor equilibrio enológico requieren una mayor graduación para sostener la estructura sin caer en la categoría ``BAJA''. De igual modo, comprimió la región ``BAJA'' de la acidez volátil, volviéndose más intolerante al ácido acético, un comportamiento plenamente coherente con la enología moderna.
+La Figura \ref{fig:curvas_difusas} ilustra cómo el algoritmo genético ajustó las curvas: en la variable alcohol desplazó el conjunto ``medio'' hacia valores más altos, reflejando que para sostener una calidad equilibrada se requiere mayor grado alcohólico. Asimismo, en la acidez volátil redujo el rango de ``bajo'', volviéndose más estricto contra el ácido acético.
 
 % =============================================================================
-\section{Fase 6: Inferencia en Casos de Estudio Reales}
+\section{Fase 6: Inferencia con Nuevos Vinos}
 % =============================================================================
 
-Para corroborar la capacidad explicativa e interactiva del sistema desarrollado, se evaluaron tres vinos arquetípicos mediante el script interactivo implementado:
+Para verificar el funcionamiento práctico del sistema, implementamos un script de inferencia interactivo (\texttt{6\_probar\_nuevo\_vino.py}) que evalúa cualquier muestra paso a paso. En la Tabla \ref{tab:ejemplos_inferencia} se presentan tres casos evaluados con el modelo final:
 
 \begin{table}[H]
 \centering
-\caption{Demostración de inferencia paso a paso en tres perfiles enológicos típicos.}
-\label{tab:casos_estudio}
+\caption{Demostración de inferencia en tres casos de vino.}
+\label{tab:ejemplos_inferencia}
 \small
-\begin{tabular}{lcccc}
+\begin{tabular}{lccc}
 \toprule
-\textbf{Parámetro Químico} & \textbf{Vino Reserva A} & \textbf{Vino de Mesa B} & \textbf{Vino Defectuoso C} \\
+\textbf{Parámetro} & \textbf{Caso 1: Vino Reserva} & \textbf{Caso 2: Vino de Mesa} & \textbf{Caso 3: Vino Defectuoso} \\
 \midrule
-Alcohol (\% vol.) & 12.50 & 10.20 & 9.10 \\
-Acidez Volátil ($\text{g/dm}^3$) & 0.350 & 0.520 & 0.880 \\
-Sulfatos ($\text{g/dm}^3$) & 0.850 & 0.620 & 0.420 \\
+Alcohol & 12.50 \% & 10.20 \% & 9.10 \% \\
+Acidez Volátil & 0.350 $\text{g/dm}^3$ & 0.520 $\text{g/dm}^3$ & 0.880 $\text{g/dm}^3$ \\
+Sulfatos & 0.850 $\text{g/dm}^3$ & 0.620 $\text{g/dm}^3$ & 0.420 $\text{g/dm}^3$ \\
 pH & 3.28 & 3.35 & 3.52 \\
 \midrule
-\textbf{1. Fuzzificación} & Alc: Alto (1.00) & Alc: Medio (0.92) & Alc: Bajo (1.00) \\
-& Acid: Bajo (1.00) & Acid: Medio (0.85) & Acid: Alto (1.00) \\
+Fuzzificación & Alcohol=Alto (1.00) & Alcohol=Medio (0.92) & Alcohol=Bajo (1.00) \\
+& Acidez=Bajo (1.00) & Acidez=Medio (0.85) & Acidez=Alto (1.00) \\
 \midrule
-\textbf{2. Inferencia MIN} & Regla $R_{37}$ ($\alpha = 1.00$) & Regla $R_{18}$ ($\alpha = 0.85$) & Regla $R_{1}$ ($\alpha = 1.00$) \\
+Regla Principal & $R_1$ ($\alpha=1.00$) & $R_6$ ($\alpha=0.85$) & $R_8$ ($\alpha=1.00$) \\
 \midrule
-\textbf{3. Agregación} & ALTA: 0.604 pts & MEDIA: 0.513 pts & BAJA: 0.557 pts \\
+Puntajes & ALTA: 0.604 pts & MEDIA: 0.513 pts & BAJA: 0.557 pts \\
 \midrule
-\textbf{4. Defuzzificación CoG} & \textbf{6.81 / 10} & \textbf{6.02 / 10} & \textbf{4.81 / 10} \\
-\textbf{Decisión Crisp} & \textbf{[ALTA]} (54.1\%) & \textbf{[MEDIA]} (58.4\%) & \textbf{[BAJA]} (84.3\%) \\
+Calificación CoG & \textbf{6.81 / 10} & \textbf{6.02 / 10} & \textbf{4.81 / 10} \\
+Predicción Final & \textbf{[ALTA]} (54.1\%) & \textbf{[MEDIA]} (58.4\%) & \textbf{[BAJA]} (84.3\%) \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -446,10 +368,10 @@ pH & 3.28 & 3.35 & 3.52 \\
 % =============================================================================
 
 \begin{enumerate}
-    \item \textbf{Resolución del Problema de Frontera:} Se demostró experimentalmente que la discretización rígida empobrece drásticamente el desempeño en test (35.00\%). La integración de funciones de pertenencia difusas resolvió este impedimento, elevando el acierto por encima del 68\% y eliminando la fragilidad ante pequeñas perturbaciones.
-    \item \textbf{Interpretabilidad Enológica:} A diferencia de modelos de caja negra (redes neuronales profundas o SVM), la combinación PRISM + Mamdani ofrece trazabilidad absoluta en cada decisión, permitiendo inspeccionar qué reglas químicas dispararon cada diagnóstico.
-    \item \textbf{Eficacia del Algoritmo Genético:} El Algoritmo Genético optimizó con éxito un espacio continuo no lineal de 67 dimensiones ($\boldsymbol{\theta} \in \mathbb{R}^{67}$) empleando cruce intermedio y mutación gaussiana, ajustando los cortes químicos a las verdaderas distribuciones de calidad enológica.
-    \item \textbf{Modularidad Académica:} La arquitectura modular organizada en carpetas independientes numeradas (\texttt{Fase\_1} a \texttt{Fase\_6}) proporciona un código mantenible, didáctico y directamente verificable.
+    \item La discretización rígida tradicional sobre variables continuas produce el problema de frontera, provocando que un clasificador de reglas estricto como PRISM obtenga un rendimiento deficiente en datos nuevos (35.00\% de exactitud).
+    \item La lógica difusa de tipo Mamdani resolvió satisfactoriamente esta limitación mediante el uso de pertenencias graduales y la agregación de múltiples reglas activadas, elevando la exactitud en el conjunto de prueba al 68.75\%.
+    \item El algoritmo genético permitió optimizar de forma continua un vector de 67 parámetros (cortes difusos y pesos de reglas), mejorando el rendimiento en entrenamiento a 63.41\% y consolidando un 67.19\% en prueba sin incurrir en sobreajuste.
+    \item El sistema híbrido desarrollado mantiene un equilibrio ideal entre precisión cuantitativa e interpretabilidad enológica, permitiendo rastrear exactamente por qué motivo químico un vino fue clasificado en una categoría determinada.
 \end{enumerate}
 
 % =============================================================================

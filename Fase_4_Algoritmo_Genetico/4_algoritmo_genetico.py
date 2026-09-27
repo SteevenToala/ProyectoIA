@@ -1,327 +1,316 @@
-"""
-=============================================================================
-FASE 4: ALGORITMO GENÉTICO (OPTIMIZACIÓN EVOLUTIVA)
-=============================================================================
-¿Qué hace este script?
-1. El Algoritmo Genético busca la MEJOR configuración para clasificar los vinos.
-2. ¿Qué optimiza?
-   - Modifica los límites de:
-       Alcohol bajo, medio, alto
-       Acidez baja, media, alta
-       Sulfatos bajo, medio, alto
-       pH bajo, medio, alto
-   - Modifica el peso de cada regla (para darle más fuerza a las reglas buenas
-     y menos fuerza a las dudosas).
-3. ¿Cómo funciona? (Evolución pura en bucles sencillos):
-   - Población: conjunto de diferentes combinaciones de límites y pesos.
-   - Fitness (Aptitud): porcentaje de vinos bien clasificados en entrenamiento.
-   - Selección por Torneo: compiten dos soluciones y gana la mejor.
-   - Cruce: combina los parámetros de dos soluciones exitosas.
-   - Mutación: pequeños cambios aleatorios para explorar nuevas ideas.
-   - Elitismo: el mejor de cada generación nunca se pierde.
-4. Guarda el mejor modelo en 'Fase_4_Algoritmo_Genetico/modelo_optimizado.json'.
-=============================================================================
-"""
+# Proyecto Inteligencia Artificial
+# Fase 4: Algoritmo Genetico para optimizar cortes y pesos de reglas en Wine Quality
 
 import os
 import json
 import random
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
 
-# Rutas automáticas
-DIRECTORIO_ACTUAL = os.path.dirname(os.path.abspath(__file__))
-DIRECTORIO_RAIZ = os.path.abspath(os.path.join(DIRECTORIO_ACTUAL, ".."))
+carpeta_actual = os.path.dirname(os.path.abspath(__file__))
+carpeta_proyecto = os.path.abspath(os.path.join(carpeta_actual, ".."))
 
-print("\n" + "="*60)
-print("     FASE 4: ALGORITMO GENÉTICO (OPTIMIZACIÓN)")
-print("="*60)
+print("=== Fase 4: Algoritmo Genetico para Optimizar el Modelo del Vino ===")
 
-# 1. Cargar datos de entrenamiento, cortes iniciales y reglas
-ruta_train = os.path.join(DIRECTORIO_RAIZ, "Fase_1_Preparacion", "datos_train.csv")
-ruta_cortes = os.path.join(DIRECTORIO_RAIZ, "Fase_1_Preparacion", "cortes_iniciales.json")
-ruta_reglas = os.path.join(DIRECTORIO_RAIZ, "Fase_2_PRISM", "reglas_descubiertas.json")
+# 1. Cargamos los datos de entrenamiento, cortes base y reglas PRISM
+ruta_datos_train = os.path.join(carpeta_proyecto, "Fase_1_Preparacion", "datos_train.csv")
+ruta_cortes_base = os.path.join(carpeta_proyecto, "Fase_1_Preparacion", "cortes_iniciales.json")
+ruta_reglas_prism = os.path.join(carpeta_proyecto, "Fase_2_PRISM", "reglas_descubiertas.json")
 
-df_train = pd.read_csv(ruta_train)
-with open(ruta_cortes) as f:
-    cortes_base = json.load(f)
-with open(ruta_reglas) as f:
-    reglas = json.load(f)
+datos_entrenamiento = pd.read_csv(ruta_datos_train)
+with open(ruta_cortes_base) as archivo_cortes:
+    cortes_base = json.load(archivo_cortes)
+with open(ruta_reglas_prism) as archivo_reglas:
+    lista_reglas = json.load(archivo_reglas)
 
-variables = ['alcohol', 'volatile acidity', 'sulphates', 'pH']
-n_reglas = len(reglas)
+lista_variables_quimicas = ['alcohol', 'acidez_volatil', 'sulfatos', 'ph']
+total_reglas = len(lista_reglas)
+total_vinos_entrenamiento = len(datos_entrenamiento)
 
-limites_extremos = {v: (cortes_base[v]['min'], cortes_base[v]['max']) for v in variables}
-X_vals = {v: df_train[v].values for v in variables}
-y_reales = df_train['calidad'].values
-n_muestras = len(df_train)
+# Limites minimos y maximos de cada variable
+limites_quimicos_extremos = {
+    var: (cortes_base[var]['minimo'], cortes_base[var]['maximo'])
+    for var in lista_variables_quimicas
+}
 
-# =============================================================================
-# FUNCIONES RÁPIDAS DEL ALGORITMO GENÉTICO
-# =============================================================================
+valores_alcohol = datos_entrenamiento['alcohol'].values
+valores_acidez = datos_entrenamiento['acidez_volatil'].values
+valores_sulfatos = datos_entrenamiento['sulfatos'].values
+valores_ph = datos_entrenamiento['ph'].values
+calidades_reales = datos_entrenamiento['calidad'].values
 
-def decodificar(cromosoma):
-    """Convierte la lista de números del cromosoma en cortes y pesos."""
-    cortes = {}
-    idx = 0
-    for v in variables:
-        min_v, max_v = limites_extremos[v]
-        c1, c2, c3 = sorted(cromosoma[idx:idx+3])
-        c1 = max(min_v, min(c1, max_v - 0.03))
-        c2 = max(c1 + 0.01, min(c2, max_v - 0.02))
-        c3 = max(c2 + 0.01, min(c3, max_v - 0.01))
-        cortes[v] = {'min': min_v, 'm1': c1, 'm2': c2, 'm3': c3, 'max': max_v}
-        idx += 3
+
+# 2. Funcion para decodificar el cromosoma (vector continuo de 67 numeros)
+# en los cortes quimicos de las 4 variables y los 55 pesos de las reglas
+def decodificar_cromosoma(cromosoma):
+    cortes_decodificados = {}
+    indice = 0
+    
+    for variable in lista_variables_quimicas:
+        minimo_quimico, maximo_quimico = limites_quimicos_extremos[variable]
         
-    pesos = [max(0.0, min(w, 2.0)) for w in cromosoma[idx:idx+n_reglas]]
-    return cortes, pesos
-
-def calcular_pertenencia_rapida(x_arr, m1, m2, m3):
-    """Calcula vectorizadamente bajo, medio, alto para agilizar la evaluación."""
-    u_bajo = np.ones_like(x_arr)
-    m1_m2 = (x_arr > m1) & (x_arr < m2)
-    u_bajo[m1_m2] = (m2 - x_arr[m1_m2]) / (m2 - m1 + 1e-9)
-    u_bajo[x_arr >= m2] = 0.0
-    
-    u_medio = np.zeros_like(x_arr)
-    m1_med = (x_arr > m1) & (x_arr <= m2)
-    u_medio[m1_med] = (x_arr[m1_med] - m1) / (m2 - m1 + 1e-9)
-    med_m3 = (x_arr > m2) & (x_arr < m3)
-    u_medio[med_m3] = (m3 - x_arr[med_m3]) / (m3 - m2 + 1e-9)
-    
-    u_alto = np.zeros_like(x_arr)
-    med_alto = (x_arr > m2) & (x_arr < m3)
-    u_alto[med_alto] = (x_arr[med_alto] - m2) / (m3 - m2 + 1e-9)
-    u_alto[x_arr >= m3] = 1.0
-    
-    return {'bajo': u_bajo, 'medio': u_medio, 'alto': u_alto}
-
-def calcular_fitness(cromosoma):
-    """Calcula el porcentaje de aciertos en entrenamiento para un cromosoma."""
-    cortes, pesos = decodificar(cromosoma)
-    
-    grados = {}
-    for v in variables:
-        c = cortes[v]
-        grados[v] = calcular_pertenencia_rapida(X_vals[v], c['m1'], c['m2'], c['m3'])
+        # Tomamos los 3 cortes de esta variable y los ordenamos de menor a mayor
+        corte_uno, corte_dos, corte_tres = sorted(cromosoma[indice : indice + 3])
         
-    scores = {'BAJA': np.zeros(n_muestras), 'MEDIA': np.zeros(n_muestras), 'ALTA': np.zeros(n_muestras)}
+        # Validamos que esten dentro de los limites permitidos
+        corte_uno = max(minimo_quimico, min(corte_uno, maximo_quimico - 0.03))
+        corte_dos = max(corte_uno + 0.01, min(corte_dos, maximo_quimico - 0.02))
+        corte_tres = max(corte_dos + 0.01, min(corte_tres, maximo_quimico - 0.01))
+        
+        cortes_decodificados[variable] = {
+            'minimo': minimo_quimico,
+            'corte_bajo': corte_uno,
+            'punto_medio': corte_dos,
+            'corte_alto': corte_tres,
+            'maximo': maximo_quimico
+        }
+        indice += 3
+        
+    pesos_decodificados = [
+        max(0.0, min(peso, 2.0))
+        for peso in cromosoma[indice : indice + total_reglas]
+    ]
     
-    for i, regla in enumerate(reglas):
-        w = pesos[i]
-        if w <= 0.01:
+    return cortes_decodificados, pesos_decodificados
+
+
+# Evaluacion rapida vectorizada de funciones de pertenencia para todos los vinos
+def calcular_pertenencias_vectorizadas(valores_columna, corte_bajo, corte_medio, corte_alto):
+    # Grado bajo (hombro izquierdo)
+    grado_bajo = np.ones_like(valores_columna)
+    rango_bajo = (valores_columna > corte_bajo) & (valores_columna < corte_medio)
+    grado_bajo[rango_bajo] = (corte_medio - valores_columna[rango_bajo]) / (corte_medio - corte_bajo + 1e-9)
+    grado_bajo[valores_columna >= corte_medio] = 0.0
+    
+    # Grado medio (triangular)
+    grado_medio = np.zeros_like(valores_columna)
+    subida = (valores_columna > corte_bajo) & (valores_columna <= corte_medio)
+    grado_medio[subida] = (valores_columna[subida] - corte_bajo) / (corte_medio - corte_bajo + 1e-9)
+    bajada = (valores_columna > corte_medio) & (valores_columna < corte_alto)
+    grado_medio[bajada] = (corte_alto - valores_columna[bajada]) / (corte_alto - corte_medio + 1e-9)
+    
+    # Grado alto (hombro derecho)
+    grado_alto = np.zeros_like(valores_columna)
+    rango_alto = (valores_columna > corte_medio) & (valores_columna < corte_alto)
+    grado_alto[rango_alto] = (valores_columna[rango_alto] - corte_medio) / (corte_alto - corte_medio + 1e-9)
+    grado_alto[valores_columna >= corte_alto] = 1.0
+    
+    return {'bajo': grado_bajo, 'medio': grado_medio, 'alto': grado_alto}
+
+
+# 3. Funcion de Aptitud (Fitness): Porcentaje de aciertos en entrenamiento (%)
+def calcular_aptitud_individuo(cromosoma):
+    cortes_evaluar, pesos_evaluar = decodificar_cromosoma(cromosoma)
+    
+    pertenencias = {
+        'alcohol': calcular_pertenencias_vectorizadas(
+            valores_alcohol,
+            cortes_evaluar['alcohol']['corte_bajo'],
+            cortes_evaluar['alcohol']['punto_medio'],
+            cortes_evaluar['alcohol']['corte_alto']
+        ),
+        'acidez_volatil': calcular_pertenencias_vectorizadas(
+            valores_acidez,
+            cortes_evaluar['acidez_volatil']['corte_bajo'],
+            cortes_evaluar['acidez_volatil']['punto_medio'],
+            cortes_evaluar['acidez_volatil']['corte_alto']
+        ),
+        'sulfatos': calcular_pertenencias_vectorizadas(
+            valores_sulfatos,
+            cortes_evaluar['sulfatos']['corte_bajo'],
+            cortes_evaluar['sulfatos']['punto_medio'],
+            cortes_evaluar['sulfatos']['corte_alto']
+        ),
+        'ph': calcular_pertenencias_vectorizadas(
+            valores_ph,
+            cortes_evaluar['ph']['corte_bajo'],
+            cortes_evaluar['ph']['punto_medio'],
+            cortes_evaluar['ph']['corte_alto']
+        )
+    }
+    
+    puntajes_acumulados_baja = np.zeros(total_vinos_entrenamiento)
+    puntajes_acumulados_media = np.zeros(total_vinos_entrenamiento)
+    puntajes_acumulados_alta = np.zeros(total_vinos_entrenamiento)
+    
+    for indice_regla, regla in enumerate(lista_reglas):
+        peso = pesos_evaluar[indice_regla]
+        if peso <= 0.01:
             continue
             
-        disparo = np.ones(n_muestras)
-        for var, etiqueta in regla['condiciones'].items():
-            disparo = np.minimum(disparo, grados[var][etiqueta])
+        disparo_regla = np.ones(total_vinos_entrenamiento)
+        for variable_quimica, etiqueta in regla['condiciones'].items():
+            disparo_regla = np.minimum(disparo_regla, pertenencias[variable_quimica][etiqueta])
             
-        scores[regla['consecuente']] += w * disparo
+        impacto_ponderado = peso * disparo_regla
         
+        if regla['consecuente'] == 'BAJA':
+            puntajes_acumulados_baja += impacto_ponderado
+        elif regla['consecuente'] == 'MEDIA':
+            puntajes_acumulados_media += impacto_ponderado
+        else:
+            puntajes_acumulados_alta += impacto_ponderado
+            
+    # Defuzzificacion por maxima pertenencia para cada vino
     predicciones = []
-    s_baja = scores['BAJA']
-    s_media = scores['MEDIA']
-    s_alta = scores['ALTA']
-    
-    for i in range(n_muestras):
-        b, m, a = s_baja[i], s_media[i], s_alta[i]
-        if a > m and a > b:
+    for i in range(total_vinos_entrenamiento):
+        puntaje_b = puntajes_acumulados_baja[i]
+        puntaje_m = puntajes_acumulados_media[i]
+        puntaje_a = puntajes_acumulados_alta[i]
+        
+        if puntaje_a > puntaje_m and puntaje_a > puntaje_b:
             predicciones.append('ALTA')
-        elif b > m and b >= a:
+        elif puntaje_b > puntaje_m and puntaje_b >= puntaje_a:
             predicciones.append('BAJA')
         else:
             predicciones.append('MEDIA')
             
-    aciertos = np.sum(np.array(predicciones) == y_reales)
-    return round((aciertos / n_muestras) * 100, 2)
+    vinos_acertados = np.sum(np.array(predicciones) == calidades_reales)
+    exactitud = (vinos_acertados / total_vinos_entrenamiento) * 100.0
+    return round(exactitud, 2)
 
 
-# =============================================================================
-# OPERADORES GENÉTICOS
-# =============================================================================
-
+# 4. Creacion del cromosoma semilla inicial
 cromosoma_semilla = []
-for v in variables:
-    cromosoma_semilla.extend([cortes_base[v]['m1'], cortes_base[v]['m2'], cortes_base[v]['m3']])
-cromosoma_semilla.extend([r['peso'] for r in reglas])
-longitud_cromosoma = len(cromosoma_semilla)
+for variable in lista_variables_quimicas:
+    cromosoma_semilla.extend([
+        cortes_base[variable]['corte_bajo'],
+        cortes_base[variable]['punto_medio'],
+        cortes_base[variable]['corte_alto']
+    ])
+cromosoma_semilla.extend([regla['peso'] for regla in lista_reglas])
 
-def crear_individuo():
-    ind = list(cromosoma_semilla)
-    for i in range(len(ind)):
+def generar_individuo_aleatorio():
+    individuo = list(cromosoma_semilla)
+    for i in range(len(individuo)):
         if i < 12:
-            ind[i] += random.gauss(0, 0.05 * abs(ind[i]))
+            # Perturbacion inicial de cortes
+            individuo[i] += random.gauss(0, 0.05 * abs(individuo[i]))
         else:
-            ind[i] = max(0.1, min(ind[i] + random.gauss(0, 0.2), 1.5))
-    return ind
+            # Perturbacion inicial de pesos
+            individuo[i] = max(0.1, min(individuo[i] + random.gauss(0, 0.2), 1.5))
+    return individuo
 
-# =============================================================================
-# HIPERPARÁMETROS DEL ALGORITMO GENÉTICO (SEGÚN DIAPOSITIVAS)
-# =============================================================================
 
+# 5. Hiperparametros del Algoritmo Genetico
 random.seed(42)
 np.random.seed(42)
 
-TAM_POBLACION = 30              # N: Tamaño de la población
-GENERACIONES = 25               # G: Criterio de parada (Generations)
-METODO_SELECCION = "tournament" # Opciones: "tournament" o "roulette"
-TOURNAMENT_SIZE = 2             # Tamaño del torneo si se usa Tournament
-PROBABILIDAD_CRUCE = 0.85       # Pc: Crossover rate (85%)
-PROBABILIDAD_MUTACION = 0.20    # Pm: Mutation rate (20%)
-ELITE_COUNT = 1                 # Elite count: mejores individuos conservados
+tamano_poblacion = 30
+numero_generaciones = 25
+probabilidad_cruce = 0.85
+probabilidad_mutacion = 0.20
+cantidad_elitismo = 1
+tamano_torneo = 2
 
-# 1. SELECCIÓN POR TORNEO (Slide: "Selection: Tournament")
-def seleccion_torneo(poblacion, fitnesses, k=TOURNAMENT_SIZE):
+# Seleccion por torneo binario
+def seleccion_por_torneo(poblacion, lista_aptitudes, k=tamano_torneo):
     participantes = random.sample(range(len(poblacion)), k)
-    mejor_idx = participantes[0]
-    for idx in participantes[1:]:
-        if fitnesses[idx] > fitnesses[mejor_idx]:
-            mejor_idx = idx
-    return poblacion[mejor_idx]
+    mejor_indice = participantes[0]
+    for indice in participantes[1:]:
+        if lista_aptitudes[indice] > lista_aptitudes[mejor_indice]:
+            mejor_indice = indice
+    return poblacion[mejor_indice]
 
-# 2. SELECCIÓN POR RULETA (Slide: "Selection: Roulette")
-def seleccion_ruleta(poblacion, fitnesses):
-    total_fit = sum(fitnesses)
-    tiro = random.uniform(0, total_fit)
-    acumulado = 0.0
-    for ind, fit in zip(poblacion, fitnesses):
-        acumulado += fit
-        if acumulado >= tiro:
-            return ind
-    return poblacion[-1]
-
-def seleccionar_padre(poblacion, fitnesses):
-    if METODO_SELECCION == "roulette":
-        return seleccion_ruleta(poblacion, fitnesses)
-    else:
-        return seleccion_torneo(poblacion, fitnesses)
-
-# 3. CRUCE INTERMEDIO (Slide: "Crossover: Intermediate")
-# Fórmula exacta de la diapositiva: HIJO = PADRE1 + rnd * (PADRE2 - PADRE1)
-def cruzar_intermediate(padre1, padre2):
+# Cruce intermedio (Intermediate Crossover)
+def cruzar_cromosomas_intermedio(padre_uno, padre_dos):
+    factor_aleatorio = random.random()
     hijo = []
-    for g1, g2 in zip(padre1, padre2):
-        rnd = random.uniform(0.3, 0.7)
-        hijo.append(g1 + rnd * (g2 - g1))
+    for gen_uno, gen_dos in zip(padre_uno, padre_dos):
+        gen_hijo = gen_uno + factor_aleatorio * (gen_dos - gen_uno)
+        hijo.append(gen_hijo)
     return hijo
 
-# 4. MUTACIÓN GAUSSIANA (Slide: "Mutation: Gaussian")
-# Agrega un número aleatorio gaussiano con media 0
-def mutar_gaussian(individuo, prob_mutacion):
-    for i in range(len(individuo)):
-        if random.random() < prob_mutacion:
-            if i < 12:
-                individuo[i] += random.gauss(0, 0.03 * abs(individuo[i]))
+# Mutacion gaussiana adaptativa
+def mutar_cromosoma_gaussiano(cromosoma):
+    cromosoma_mutado = list(cromosoma)
+    for indice_gen in range(len(cromosoma_mutado)):
+        if random.random() < probabilidad_mutacion:
+            if indice_gen < 12:
+                # Mutacion en cortes
+                cromosoma_mutado[indice_gen] += random.gauss(0, 0.04 * abs(cromosoma_mutado[indice_gen]))
             else:
-                individuo[i] = max(0.0, min(individuo[i] + random.gauss(0, 0.15), 2.0))
-    return individuo
+                # Mutacion en pesos
+                cromosoma_mutado[indice_gen] = max(0.05, min(cromosoma_mutado[indice_gen] + random.gauss(0, 0.15), 2.0))
+    return cromosoma_mutado
 
-print(f"Configuración del Algoritmo Genético (Toolbox):")
-print(f"  • Tamaño de población (N):      {TAM_POBLACION} individuos")
-print(f"  • Criterio de parada:           {GENERACIONES} generaciones")
-print(f"  • Método de Selección:          {METODO_SELECCION.upper()}")
-print(f"  • Tipo de Crossover:            INTERMEDIATE (Cruce Intermedio)")
-print(f"  • Tipo de Mutación:             GAUSSIAN (Gaussiana media 0)")
-print(f"  • Probabilidad de Cruce (Pc):   {PROBABILIDAD_CRUCE * 100:.0f} %")
-print(f"  • Probabilidad de Mutación (Pm):{PROBABILIDAD_MUTACION * 100:.0f} %")
-print(f"  • Elite Count:                  {ELITE_COUNT} individuo(s)")
-print(f"  • Number of Variables:          {longitud_cromosoma} parámetros en theta")
 
-poblacion = [cromosoma_semilla]
-for _ in range(TAM_POBLACION - 1):
-    poblacion.append(crear_individuo())
+# 6. Bucle Evolutivo
+print(f"Poblacion: {tamano_poblacion} | Generaciones: {numero_generaciones}")
+print(f"Probabilidad Cruce: {probabilidad_cruce} | Probabilidad Mutacion: {probabilidad_mutacion}")
 
-fitnesses = [calcular_fitness(ind) for ind in poblacion]
-mejor_fitness_inicial = max(fitnesses)
-print(f"\nAcierto inicial antes de optimizar (Cuantiles): {mejor_fitness_inicial:.2f} %")
-print("\nComenzando evolución...")
+aptitud_inicial = calcular_aptitud_individuo(cromosoma_semilla)
+print(f"Aptitud inicial con cortes por cuantiles: {aptitud_inicial}%\n")
 
-mejor_global = poblacion[fitnesses.index(mejor_fitness_inicial)]
-mejor_fitness_global = mejor_fitness_inicial
-historial = [mejor_fitness_global]
+poblacion_actual = [list(cromosoma_semilla)]
+for _ in range(tamano_poblacion - 1):
+    poblacion_actual.append(generar_individuo_aleatorio())
 
-for gen in range(1, GENERACIONES + 1):
-    nueva_poblacion = []
+mejor_cromosoma_global = list(cromosoma_semilla)
+mejor_aptitud_global = aptitud_inicial
+historial_convergencia = [aptitud_inicial]
+
+for generacion in range(1, numero_generaciones + 1):
+    aptitudes_poblacion = [calcular_aptitud_individuo(ind) for ind in poblacion_actual]
     
-    # REPRODUCTION: Elite Count (pasan intactos los mejores)
-    indices_ordenados = np.argsort(fitnesses)[::-1]
-    for e in range(ELITE_COUNT):
-        nueva_poblacion.append(list(poblacion[indices_ordenados[e]]))
-    
-    # REPRODUCCIÓN HASTA COMPLETAR N INDIVIDUOS
-    while len(nueva_poblacion) < TAM_POBLACION:
-        # Selección
-        padre1 = seleccionar_padre(poblacion, fitnesses)
-        padre2 = seleccionar_padre(poblacion, fitnesses)
+    indice_mejor_gen = np.argmax(aptitudes_poblacion)
+    if aptitudes_poblacion[indice_mejor_gen] > mejor_aptitud_global:
+        mejor_aptitud_global = aptitudes_poblacion[indice_mejor_gen]
+        mejor_cromosoma_global = list(poblacion_actual[indice_mejor_gen])
         
-        # Crossover (Intermediate)
-        if random.random() < PROBABILIDAD_CRUCE:
-            hijo = cruzar_intermediate(padre1, padre2)
+    historial_convergencia.append(mejor_aptitud_global)
+    
+    if generacion % 5 == 0 or generacion == numero_generaciones:
+        print(f"  Generacion {generacion:02d}/{numero_generaciones} -> Mejor Exactitud en Train: {mejor_aptitud_global:.2f}%")
+        
+    # Elitismo: preservamos al mejor individuo
+    nueva_poblacion = [list(mejor_cromosoma_global)]
+    
+    while len(nueva_poblacion) < tamano_poblacion:
+        padre_uno = seleccion_por_torneo(poblacion_actual, aptitudes_poblacion)
+        padre_dos = seleccion_por_torneo(poblacion_actual, aptitudes_poblacion)
+        
+        if random.random() < probabilidad_cruce:
+            hijo = cruzar_cromosomas_intermedio(padre_uno, padre_dos)
         else:
-            hijo = list(padre1)
+            hijo = list(padre_uno)
             
-        # Mutation (Gaussian)
-        hijo = mutar_gaussian(hijo, PROBABILIDAD_MUTACION)
-        
+        hijo = mutar_cromosoma_gaussiano(hijo)
         nueva_poblacion.append(hijo)
-
         
-    poblacion = nueva_poblacion
-    fitnesses = [calcular_fitness(ind) for ind in poblacion]
-    
-    max_gen = max(fitnesses)
-    if max_gen > mejor_fitness_global:
-        mejor_fitness_global = max_gen
-        mejor_global = list(poblacion[fitnesses.index(max_gen)])
-        
-    historial.append(mejor_fitness_global)
-    
-    if gen % 5 == 0 or gen == GENERACIONES:
-        print(f"  Generación {gen:02d} | Mejor acierto en entrenamiento: {mejor_fitness_global:.2f} %")
+    poblacion_actual = nueva_poblacion
 
-cortes_optimizados, pesos_optimizados = decodificar(mejor_global)
+print(f"\nOptimizacion finalizada. Mejor exactitud alcanzada: {mejor_aptitud_global:.2f}%")
 
-resultado_final = {
+# Guardamos el modelo optimizado
+cortes_optimizados, pesos_optimizados = decodificar_cromosoma(mejor_cromosoma_global)
+
+resultado_modelo = {
+    'aptitud_inicial': aptitud_inicial,
+    'aptitud_optimizada': mejor_aptitud_global,
     'cortes_optimizados': cortes_optimizados,
-    'pesos_optimizados': [round(w, 4) for w in pesos_optimizados],
-    'fitness_inicial': mejor_fitness_inicial,
-    'fitness_final': mejor_fitness_global,
-    'historial': historial
+    'pesos_optimizados': [round(p, 4) for p in pesos_optimizados],
+    'historial': historial_convergencia
 }
 
-ruta_guardar = os.path.join(DIRECTORIO_ACTUAL, "modelo_optimizado.json")
-with open(ruta_guardar, "w") as f:
-    json.dump(resultado_final, f, indent=4)
+ruta_guardar_modelo = os.path.join(carpeta_actual, "modelo_optimizado.json")
+with open(ruta_guardar_modelo, "w") as archivo_json:
+    json.dump(resultado_modelo, archivo_json, indent=4)
 
-# Guardar gráfico de convergencia del AG
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-
-plt.figure(figsize=(8, 4.5))
-plt.plot(range(len(historial)), historial, marker='o', color='#E74C3C', linewidth=2.2, markersize=5)
-plt.title('Convergencia del Algoritmo Genético', fontsize=12, fontweight='bold')
-plt.xlabel('Generación')
-plt.ylabel('Acierto en Entrenamiento (%)')
-plt.grid(True, linestyle='--', alpha=0.5)
+# Grafico de convergencia
+plt.figure(figsize=(7, 4))
+plt.plot(range(len(historial_convergencia)), historial_convergencia, marker='o', color='#2b5c8f', linewidth=2)
+plt.title('Convergencia del Algoritmo Genetico')
+plt.xlabel('Generacion')
+plt.ylabel('Exactitud en Train (%)')
+plt.grid(True, linestyle='--', alpha=0.6)
 plt.tight_layout()
-ruta_grafico_ga = os.path.join(DIRECTORIO_ACTUAL, "grafico_convergencia_ga.png")
-plt.savefig(ruta_grafico_ga, dpi=150)
+
+ruta_grafico_convergencia = os.path.join(carpeta_actual, "grafico_convergencia_ga.png")
+plt.savefig(ruta_grafico_convergencia, dpi=120)
 plt.close()
 
-print("\n" + "="*70)
-print(f"OPTIMIZACIÓN COMPLETADA:")
-print(f"  • Acierto inicial (cuantiles): {mejor_fitness_inicial:.2f} %")
-print(f"  • Acierto final optimizado:   {mejor_fitness_global:.2f} % (Mejora: +{mejor_fitness_global - mejor_fitness_inicial:.2f} %)")
-print("="*70)
-
-print("\nNuevos límites químicos optimizados por el AG:")
-for v in variables:
-    c = cortes_optimizados[v]
-    print(f"  • {v:17s} -> m1 (Bajo/Medio): {c['m1']:.2f} | m2 (Centro): {c['m2']:.2f} | m3 (Medio/Alto): {c['m3']:.2f}")
-
-print("\nArchivos generados en Fase_4_Algoritmo_Genetico/:")
-print("  -> modelo_optimizado.json")
-print("  -> grafico_convergencia_ga.png")
-print("--- FASE 4 COMPLETADA CON ÉXITO ---\n")
-
+print("\nArchivos generados en Fase_4_Algoritmo_Genetico:")
+print("  - modelo_optimizado.json")
+print("  - grafico_convergencia_ga.png")
