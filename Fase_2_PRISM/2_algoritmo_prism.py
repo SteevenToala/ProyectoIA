@@ -62,7 +62,7 @@ def buscar_mejor_condicion(condiciones_candidatas, datos_actuales, clase_objetiv
             mayor_confianza = confianza
             mayor_cobertura = vinos_acertados
             mejor_condicion = (caracteristica, etiqueta)
-        elif abs(confianza - mayor_confianza) < 1e-6 and vinos_acertados > mayor_cobertura:
+        elif confianza == mayor_confianza and vinos_acertados > mayor_cobertura:
             mayor_cobertura = vinos_acertados
             mejor_condicion = (caracteristica, etiqueta)
             

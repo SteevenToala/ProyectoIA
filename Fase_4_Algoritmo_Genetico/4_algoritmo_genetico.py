@@ -80,20 +80,20 @@ def calcular_pertenencias_vectorizadas(valores_columna, corte_bajo, corte_medio,
     # Grado bajo (hombro izquierdo)
     grado_bajo = np.ones_like(valores_columna)
     rango_bajo = (valores_columna > corte_bajo) & (valores_columna < corte_medio)
-    grado_bajo[rango_bajo] = (corte_medio - valores_columna[rango_bajo]) / (corte_medio - corte_bajo + 1e-9)
+    grado_bajo[rango_bajo] = (corte_medio - valores_columna[rango_bajo]) / (corte_medio - corte_bajo)
     grado_bajo[valores_columna >= corte_medio] = 0.0
     
     # Grado medio (triangular)
     grado_medio = np.zeros_like(valores_columna)
     subida = (valores_columna > corte_bajo) & (valores_columna <= corte_medio)
-    grado_medio[subida] = (valores_columna[subida] - corte_bajo) / (corte_medio - corte_bajo + 1e-9)
+    grado_medio[subida] = (valores_columna[subida] - corte_bajo) / (corte_medio - corte_bajo)
     bajada = (valores_columna > corte_medio) & (valores_columna < corte_alto)
-    grado_medio[bajada] = (corte_alto - valores_columna[bajada]) / (corte_alto - corte_medio + 1e-9)
+    grado_medio[bajada] = (corte_alto - valores_columna[bajada]) / (corte_alto - corte_medio)
     
     # Grado alto (hombro derecho)
     grado_alto = np.zeros_like(valores_columna)
     rango_alto = (valores_columna > corte_medio) & (valores_columna < corte_alto)
-    grado_alto[rango_alto] = (valores_columna[rango_alto] - corte_medio) / (corte_alto - corte_medio + 1e-9)
+    grado_alto[rango_alto] = (valores_columna[rango_alto] - corte_medio) / (corte_alto - corte_medio)
     grado_alto[valores_columna >= corte_alto] = 1.0
     
     return {'bajo': grado_bajo, 'medio': grado_medio, 'alto': grado_alto}
